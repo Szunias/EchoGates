@@ -1,0 +1,34 @@
+{
+    "name": "ActionList",
+    "maps": [
+        {
+            "name": "Player",
+            "id": "050f5454-86ac-4a8c-b5b2-5cd867bba673",
+            "actions": [
+                {
+                    "name": "Open Inventory",
+                    "type": "Button",
+                    "id": "23c9c6cd-25c8-4964-bb5e-16e0f6dc9fe1",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "441271e5-80f0-4f0b-b351-a451c99055d7",
+                    "path": "<Keyboard>/e",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Open Inventory",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        }
+    ],
+    "controlSchemes": []
+}

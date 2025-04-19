@@ -1,18 +1,24 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PlayerMovement : MonoBehaviour
 {
     [SerializeField] private float moveSpeed = 16;
+    [SerializeField] private GameObject inventoryObject;
 
     private Vector3 spawnPoint;
     private CharacterController characterController;
     private new Camera camera;
+    private bool inInventory;
+    private Canvas inventoryCanvas;
 
     private void Start()
     {
         characterController = GetComponent<CharacterController>();
         spawnPoint = transform.position;
         camera = Camera.main;
+        inventoryCanvas = inventoryObject.GetComponent<Canvas>();
+        inventoryCanvas.enabled = false;
     }
 
     private void Update()
@@ -38,4 +44,15 @@ public class PlayerMovement : MonoBehaviour
         transform.position = spawnPoint;
         characterController.enabled = true;
     }
+
+    public void OpenInventory(InputAction.CallbackContext context)
+    {
+        if (context.performed)
+        {
+            inInventory = !inInventory;
+
+            inventoryCanvas.enabled = inInventory;
+        }
+    }
 }
+

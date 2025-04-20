@@ -25,10 +25,15 @@ public class InventoryManager : MonoBehaviour
 
     public void ListItems()
     {
-        foreach (Item items in Items) 
+        foreach (Item item in Items) 
         {
             GameObject obj = Instantiate(InventoryItem, ItemContent);
             var itemName = obj.transform.Find("Item/ItemName").GetComponent<Text>();
+            var itemIcon = obj.transform.Find("Item/ItemName").GetComponent<Image>();
+
+            itemName.text = item.itemName;
+            itemIcon.sprite = item.icon;
+
         }
     }
 }

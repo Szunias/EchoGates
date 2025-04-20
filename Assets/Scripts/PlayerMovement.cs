@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using static UnityEditor.Progress;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -13,6 +14,8 @@ public class PlayerMovement : MonoBehaviour
     private bool inInventory;
     private Canvas inventoryCanvas;
     private CameraMovement cameraComponent;
+
+    private const float maxDistance = 2.5f;
 
     private void Start()
     {
@@ -65,5 +68,27 @@ public class PlayerMovement : MonoBehaviour
         }
     }
     
+    public void Interaction(InputAction.CallbackContext context)
+    {
+        if (context.performed)
+        {
+            LayerMask layerMask = LayerMask.GetMask("PickUp");
+            RaycastHit hit;
+            if (Physics.Raycast(camera.transform.position, camera.transform.forward, out hit, maxDistance, layerMask))
+            {
+                GameObject hitObject = hit.collider.gameObject;
+                hitObject.GetComponent<ItemPickup>().Pickup();
+
+                //Debug.DrawRay(camera.transform.position, camera.transform.forward * hit.distance, Color.magenta,2f);
+                Debug.Log("Hit");
+            }
+            else
+            {
+                Debug.DrawRay(camera.transform.position, camera.transform.forward * 2.5f, Color.blue, 2f);
+                Debug.Log("Not hit");
+            }
+
+        }
+    }
 }
 

@@ -4225,6 +4225,22 @@ PrefabInstance:
       propertyPath: player
       value: 
       objectReference: {fileID: 1397483322}
+    - target: {fileID: 3650984033947866759, guid: c1a2b3f96520f5041ae0b7946870fb64, type: 3}
+      propertyPath: sightRange
+      value: 30
+      objectReference: {fileID: 0}
+    - target: {fileID: 3650984033947866759, guid: c1a2b3f96520f5041ae0b7946870fb64, type: 3}
+      propertyPath: LaunchSpeedUP
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3650984033947866759, guid: c1a2b3f96520f5041ae0b7946870fb64, type: 3}
+      propertyPath: LaunchSpeedForward
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 3650984033947866759, guid: c1a2b3f96520f5041ae0b7946870fb64, type: 3}
+      propertyPath: timeBetweenAttacks
+      value: 0.9
+      objectReference: {fileID: 0}
     - target: {fileID: 4809787479872374692, guid: c1a2b3f96520f5041ae0b7946870fb64, type: 3}
       propertyPath: m_LocalPosition.x
       value: 4.541281

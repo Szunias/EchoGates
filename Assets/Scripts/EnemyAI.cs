@@ -12,6 +12,11 @@ public class EnemyAI : MonoBehaviour
 
     public float health;
 
+    [SerializeField]
+    private float LaunchSpeedUP = 8f;
+    [SerializeField]
+    private float LaunchSpeedForward = 32f;
+
     //Patroling
     public Vector3 walkPoint;
     bool walkPointSet;
@@ -84,8 +89,8 @@ public class EnemyAI : MonoBehaviour
         {
             ///Attack code here
             Rigidbody rb = Instantiate(projectile, transform.position, Quaternion.identity).GetComponent<Rigidbody>();
-            rb.AddForce(transform.forward * 32f, ForceMode.Impulse);
-            rb.AddForce(transform.up * 8f, ForceMode.Impulse);
+            rb.AddForce(transform.forward * LaunchSpeedForward, ForceMode.Impulse);
+            rb.AddForce(transform.up * LaunchSpeedUP, ForceMode.Impulse);
             ///End of attack code
 
             alreadyAttacked = true;

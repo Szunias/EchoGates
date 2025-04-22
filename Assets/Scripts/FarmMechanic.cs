@@ -23,6 +23,7 @@ public class FarmMechanic : MonoBehaviour
             startGrowing = true;
             gameObject.transform.localPosition = new Vector3(0, 0.2f, 0);
             growingComplete = false;
+            m_wateringMultiplier = 0;
         }
     }
 

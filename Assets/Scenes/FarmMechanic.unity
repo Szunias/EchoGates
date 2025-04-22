@@ -489,7 +489,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ba6334cfeaa54f340a5d0da19a8cfd26, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_timeToGrow: 14000
+  m_timeToGrow: 1400
   m_wateringMultiplier: 0
 --- !u!136 &1601123477
 CapsuleCollider:

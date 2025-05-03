@@ -27,6 +27,9 @@ public class PlayerMovement : MonoBehaviour
         inventoryCanvas.enabled = false;
 
         cameraComponent = cameraObject.GetComponent<CameraMovement>();
+
+        Cursor.lockState = CursorLockMode.Locked;   
+        Cursor.visible = false;
     }
 
     private void Update()
@@ -65,6 +68,10 @@ public class PlayerMovement : MonoBehaviour
             inventoryCanvas.enabled = inInventory;
 
             cameraComponent.EnableRotation(!inInventory);
+
+            Cursor.lockState = inInventory ? CursorLockMode.None  
+                                     : CursorLockMode.Locked; 
+            Cursor.visible = inInventory;
         }
     }
     

@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 2201856030858150247}
   - component: {fileID: 8337252871770770725}
   - component: {fileID: 1902558506620536307}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: BottleBottom
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -97,7 +97,7 @@ GameObject:
   - component: {fileID: 6412972967377048058}
   - component: {fileID: 7418267543261549686}
   - component: {fileID: 5120975442691337169}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: BottleNeck
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -184,7 +184,7 @@ GameObject:
   - component: {fileID: 4204327869981167505}
   - component: {fileID: 8387207858890205551}
   - component: {fileID: 1553658981976911882}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Bottle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -233,7 +233,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 97a2fb10ab8ed12418ef4ad803095484, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  item: {fileID: 0}
+  item: {fileID: 11400000, guid: 443827afda990a143a3f937a7d515832, type: 2}
 --- !u!65 &1553658981976911882
 BoxCollider:
   m_ObjectHideFlags: 0

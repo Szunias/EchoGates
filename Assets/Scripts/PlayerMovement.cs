@@ -7,6 +7,10 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float moveSpeed = 16;
     [SerializeField] private GameObject inventoryObject;
     [SerializeField] private GameObject cameraObject;
+    [Header("Audio")]                                    
+    [SerializeField] private AudioSource audioSource;     
+    [SerializeField] private AudioClip inventoryOpenClip; 
+    [SerializeField] private AudioClip inventoryCloseClip;
 
     private Vector3 spawnPoint;
     private CharacterController characterController;
@@ -30,6 +34,7 @@ public class PlayerMovement : MonoBehaviour
 
         Cursor.lockState = CursorLockMode.Locked;   
         Cursor.visible = false;
+        if (!audioSource) audioSource = GetComponent<AudioSource>();
     }
 
     private void Update()
@@ -68,6 +73,12 @@ public class PlayerMovement : MonoBehaviour
             inventoryCanvas.enabled = inInventory;
 
             cameraComponent.EnableRotation(!inInventory);
+
+            if (audioSource)
+            {
+                AudioClip clip = inInventory ? inventoryOpenClip : inventoryCloseClip;
+                if (clip) audioSource.PlayOneShot(clip);
+            }
 
             Cursor.lockState = inInventory ? CursorLockMode.None  
                                      : CursorLockMode.Locked; 

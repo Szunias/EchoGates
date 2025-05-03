@@ -37,7 +37,7 @@
                 {
                     "name": "",
                     "id": "441271e5-80f0-4f0b-b351-a451c99055d7",
-                    "path": "<Keyboard>/e",
+                    "path": "<Keyboard>/tab",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
@@ -48,7 +48,7 @@
                 {
                     "name": "",
                     "id": "3a9047cb-af0d-42cd-bfdb-e7afc09064c6",
-                    "path": "<Mouse>/leftButton",
+                    "path": "<Keyboard>/e",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
@@ -59,7 +59,7 @@
                 {
                     "name": "",
                     "id": "e0e1e722-bc3e-49a9-930c-567f5df06a85",
-                    "path": "<Keyboard>/r",
+                    "path": "<Mouse>/leftButton",
                     "interactions": "",
                     "processors": "",
                     "groups": "",

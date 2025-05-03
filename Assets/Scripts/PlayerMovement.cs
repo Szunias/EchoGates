@@ -1,16 +1,23 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
-using static UnityEditor.Progress;
 
 public class PlayerMovement : MonoBehaviour
 {
     [SerializeField] private float moveSpeed = 16;
     [SerializeField] private GameObject inventoryObject;
     [SerializeField] private GameObject cameraObject;
-    [Header("Audio")]                                    
-    [SerializeField] private AudioSource audioSource;     
-    [SerializeField] private AudioClip inventoryOpenClip; 
+
+    [Header("Audio")]
+    [SerializeField] private AudioSource audioSource;
+    [SerializeField] private AudioClip inventoryOpenClip;
     [SerializeField] private AudioClip inventoryCloseClip;
+
+    // --- Jump variables (added) ------------------------------------------------
+    [Header("Jump Settings")]
+    [SerializeField] private float jumpHeight = 2f;          // How high the player jumps
+    [SerializeField] private float gravity = -9.81f;         // Gravity acceleration (negative)
+    private float verticalVelocity;                          // Current Y velocity
+    // --------------------------------------------------------------------------
 
     private Vector3 spawnPoint;
     private CharacterController characterController;
@@ -32,15 +39,25 @@ public class PlayerMovement : MonoBehaviour
 
         cameraComponent = cameraObject.GetComponent<CameraMovement>();
 
-        Cursor.lockState = CursorLockMode.Locked;   
+        Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
         if (!audioSource) audioSource = GetComponent<AudioSource>();
     }
 
     private void Update()
     {
-        if (!inInventory) 
+        if (!inInventory)
         {
+            // --- Jump logic (added) -------------------------------------------
+            if (characterController.isGrounded && verticalVelocity < 0f)
+                verticalVelocity = -2f; // small push to keep grounded
+
+            if (Input.GetButtonDown("Jump") && characterController.isGrounded)
+                verticalVelocity = Mathf.Sqrt(jumpHeight * -2f * gravity); // initial jump impulse
+
+            verticalVelocity += gravity * Time.deltaTime; // apply gravity
+            // ------------------------------------------------------------------
+
             Vector3 input = new Vector3(Input.GetAxis("Horizontal"), 0f, Input.GetAxis("Vertical"));
 
             Vector3 forward = camera.transform.forward;
@@ -51,10 +68,11 @@ public class PlayerMovement : MonoBehaviour
 
             Vector3 direction = forward * input.z + right * input.x;
 
+            Vector3 move = direction * moveSpeed;   // horizontal movement
+            move.y = verticalVelocity;               // vertical movement added
 
-            characterController.Move(direction * moveSpeed * Time.deltaTime);
+            characterController.Move(move * Time.deltaTime);
         }
-        
     }
 
     public void ResetPosition()
@@ -80,24 +98,20 @@ public class PlayerMovement : MonoBehaviour
                 if (clip) audioSource.PlayOneShot(clip);
             }
 
-            Cursor.lockState = inInventory ? CursorLockMode.None  
-                                     : CursorLockMode.Locked; 
+            Cursor.lockState = inInventory ? CursorLockMode.None : CursorLockMode.Locked;
             Cursor.visible = inInventory;
         }
     }
-    
+
     public void Interaction(InputAction.CallbackContext context)
     {
         if (context.performed)
         {
             LayerMask layerMask = LayerMask.GetMask("PickUp");
-            RaycastHit hit;
-            if (Physics.Raycast(camera.transform.position, camera.transform.forward, out hit, maxDistance, layerMask))
+            if (Physics.Raycast(camera.transform.position, camera.transform.forward, out RaycastHit hit, maxDistance, layerMask))
             {
                 GameObject hitObject = hit.collider.gameObject;
                 hitObject.GetComponent<ItemPickup>().Pickup();
-
-                //Debug.DrawRay(camera.transform.position, camera.transform.forward * hit.distance, Color.magenta,2f);
                 Debug.Log("Hit");
             }
             else
@@ -105,8 +119,6 @@ public class PlayerMovement : MonoBehaviour
                 Debug.DrawRay(camera.transform.position, camera.transform.forward * 2.5f, Color.blue, 2f);
                 Debug.Log("Not hit");
             }
-
         }
     }
 }
-

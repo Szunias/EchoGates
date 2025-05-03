@@ -1,20 +1,37 @@
 ﻿using UnityEngine;
+using UnityEngine.InputSystem;   // ✨ New Input System
 
 public class PlayerMeleeAttack : MonoBehaviour
 {
     [Header("Combat")]
-    [SerializeField] private float attackRange = 5f;           // Melee reach
-    [SerializeField] private LayerMask enemyMask = ~0;         // Layers to hit
+    [SerializeField] private float attackRange = 5f;
+    [SerializeField] private LayerMask enemyMask = ~0;
 
     [Header("Audio")]
-    [SerializeField] private AudioSource audioSource;          // Source that plays the swing
-    [SerializeField] private AudioClip swingClip;             // Sound of the attack
+    [SerializeField] private AudioSource audioSource;
+    [SerializeField] private AudioClip swingClip;
 
     [Header("References")]
-    [SerializeField] private Transform attackOrigin;           // If left empty, main or first camera is used
+    [SerializeField] private Transform attackOrigin;
+
+    [Header("Input")]
+    [Tooltip("Drag your “Attack” InputActionReference here")]
+    [SerializeField] private InputActionReference attackAction;   // <-- reference to the action
+
+    private void OnEnable()
+    {
+        // make sure the action is enabled when this component is active
+        if (attackAction) attackAction.action.Enable();
+    }
+
+    private void OnDisable()
+    {
+        if (attackAction) attackAction.action.Disable();
+    }
 
     private void Start()
     {
+        // fallback ‑ if no attackOrigin was set in the Inspector, grab the main camera
         if (!attackOrigin)
         {
             Camera cam = Camera.main ? Camera.main : FindObjectOfType<Camera>();
@@ -25,7 +42,8 @@ public class PlayerMeleeAttack : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.R))
+        // InputSystem polling: true in the frame the button/trigger was pressed
+        if (attackAction && attackAction.action.WasPressedThisFrame())
             AttemptAttack();
     }
 

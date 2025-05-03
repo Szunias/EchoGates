@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 3650984033947866759}
   - component: {fileID: 1289287940724162061}
   - component: {fileID: 1154650883019050057}
+  - component: {fileID: -3831503079692201436}
   m_Layer: 9
   m_Name: Enemy
   m_TagString: Untagged
@@ -280,3 +281,22 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &-3831503079692201436
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2541105231805397314}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 02353156a01c6e04ebd7c12645eb0cc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  lootTable:
+  - pickupPrefab: {fileID: 6913218500829616204, guid: b0adc1efb7fa838418c3137df3011d8a, type: 3}
+    chancePercent: 33
+  - pickupPrefab: {fileID: 6913218500829616204, guid: b0adc1efb7fa838418c3137df3011d8a, type: 3}
+    chancePercent: 33
+  - pickupPrefab: {fileID: 6913218500829616204, guid: b0adc1efb7fa838418c3137df3011d8a, type: 3}
+    chancePercent: 33

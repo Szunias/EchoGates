@@ -50,7 +50,16 @@ public class EnemyHealth : MonoBehaviour
             Destroy(temp, deathClip.length);                         // auto‑sprzątanie
         }
 
-        // 2. natychmiast usuń wizualną część wroga
-        Destroy(gameObject);                                         // to samo tempo co wcześniej
+        // …kod jak poprzednio…
+
+        // 2. natychmiast usuń wizualną część wroga
+        var dropper = GetComponent<EnemyItemDrop>();   // pobieramy skrypt dropu   ← dodane
+        if (dropper) dropper.TryDrop();                // próbujemy zrzucić loot    ← dodane
+
+        Destroy(gameObject);
+
+
+// 2. natychmiast usuń wizualną część wroga
+Destroy(gameObject);                                         // to samo tempo co wcześniej
     }
 }

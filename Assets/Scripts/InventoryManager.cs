@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -28,8 +29,12 @@ public class InventoryManager : MonoBehaviour
         foreach (Item item in Items) 
         {
             GameObject obj = Instantiate(InventoryItem, ItemContent);
-            var itemName = obj.transform.Find("Item/ItemName").GetComponent<Text>();
-            var itemIcon = obj.transform.Find("Item/ItemName").GetComponent<Image>();
+
+            //var itemName = obj.transform.Find("ItemName (UnityEngine.GameObject)").GetComponent<Text>();
+            //var itemIcon = obj.transform.Find("ItemName").GetComponent<Image>();
+
+            var itemName = obj.transform.GetComponentInChildren<TMP_Text>();
+            var itemIcon = obj.transform.GetComponentInChildren<Image>();
 
             itemName.text = item.itemName;
             itemIcon.sprite = item.icon;

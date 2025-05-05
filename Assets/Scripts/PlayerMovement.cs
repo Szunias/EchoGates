@@ -100,6 +100,11 @@ public class PlayerMovement : MonoBehaviour
 
             Cursor.lockState = inInventory ? CursorLockMode.None : CursorLockMode.Locked;
             Cursor.visible = inInventory;
+
+            if (inInventory)
+            {
+                InventoryManager.Instance.ListItems(); 
+            }
         }
     }
 

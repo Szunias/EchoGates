@@ -26,19 +26,19 @@ public class InventoryManager : MonoBehaviour
 
     public void ListItems()
     {
-        foreach (Item item in Items) 
+        // ZMIANA: przed wypisaniem itemów czyœcimy poprzednie entry w ItemContent
+        foreach (Transform child in ItemContent)
+            Destroy(child.gameObject);
+
+        foreach (Item item in Items)
         {
             GameObject obj = Instantiate(InventoryItem, ItemContent);
-
-            //var itemName = obj.transform.Find("ItemName (UnityEngine.GameObject)").GetComponent<Text>();
-            //var itemIcon = obj.transform.Find("ItemName").GetComponent<Image>();
-
             var itemName = obj.transform.GetComponentInChildren<TMP_Text>();
             var itemIcon = obj.transform.GetComponentInChildren<Image>();
 
             itemName.text = item.itemName;
             itemIcon.sprite = item.icon;
-
         }
     }
+
 }

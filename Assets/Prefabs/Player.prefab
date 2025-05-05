@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 2271469307539103940}
   - component: {fileID: 5907756903357778770}
   - component: {fileID: -8284611558556089666}
+  - component: {fileID: -2965601520041823601}
   m_Layer: 7
   m_Name: Player
   m_TagString: Untagged
@@ -130,6 +131,11 @@ MonoBehaviour:
   moveSpeed: 16
   inventoryObject: {fileID: 0}
   cameraObject: {fileID: 7800109345962755932}
+  audioSource: {fileID: 0}
+  inventoryOpenClip: {fileID: 0}
+  inventoryCloseClip: {fileID: 0}
+  jumpHeight: 2
+  gravity: -9.81
 --- !u!143 &2271469307539103940
 CharacterController:
   m_ObjectHideFlags: 0
@@ -212,6 +218,10 @@ MonoBehaviour:
         m_CallState: 2
     m_ActionId: a5c0ea9d-9f7c-499b-8cd8-473c1ebaf20a
     m_ActionName: 'Player/Interaction[/Mouse/leftButton]'
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 6db4953d-df54-4a8a-a466-a370dd8aabd8
+    m_ActionName: 'Player/Attack[/Mouse/leftButton]'
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: Player
@@ -236,6 +246,19 @@ MonoBehaviour:
   audioSource: {fileID: 0}
   swingClip: {fileID: 0}
   attackOrigin: {fileID: 0}
+  attackAction: {fileID: 0}
+--- !u!114 &-2965601520041823601
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3187143148051052950}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 119da31df6795114cb6b5920c91742dc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &7800109345962755932
 GameObject:
   m_ObjectHideFlags: 0

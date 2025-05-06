@@ -221,6 +221,37 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!1 &601532313
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 601532314}
+  m_Layer: 0
+  m_Name: Spawnpoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &601532314
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 601532313}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.08, y: 0.47, z: 0.08}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 632498707}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &632498703
 GameObject:
   m_ObjectHideFlags: 0
@@ -327,7 +358,8 @@ Transform:
   m_LocalPosition: {x: -4.57, y: 0.93, z: 0}
   m_LocalScale: {x: 1, y: 1.5, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 601532314}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &632498708
@@ -343,7 +375,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   chargeBar: {fileID: 1275053914}
-  maxCharge: 50
+  chargeAmount: 100
+  spawnPoint: {fileID: 601532314}
+  chargeablePrefab: {fileID: 2354324599331993152, guid: 088063189c4c96645ad8277ee3e0e32c, type: 3}
 --- !u!1001 &1077787846
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -400,6 +434,10 @@ PrefabInstance:
       propertyPath: m_TagString
       value: Player
       objectReference: {fileID: 0}
+    - target: {fileID: 5286752508549349766, guid: 98db70db9a0b3b3459e4293c1a6e5e11, type: 3}
+      propertyPath: inventoryObject
+      value: 
+      objectReference: {fileID: 4647673186193161896, guid: d64adfb91eea211468718b79868e5d80, type: 3}
     - target: {fileID: 6855855811812421704, guid: 98db70db9a0b3b3459e4293c1a6e5e11, type: 3}
       propertyPath: m_IsTrigger
       value: 1

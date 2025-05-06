@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Resettable
   - EnemyProjectile
+  - Chargeable
   layers:
   - Default
   - TransparentFX

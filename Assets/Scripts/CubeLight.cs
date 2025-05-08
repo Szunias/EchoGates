@@ -4,27 +4,27 @@ using System.Collections;
 [RequireComponent(typeof(Light), typeof(LineRenderer))]
 public class CubeLight : MonoBehaviour
 {
-    [SerializeField] private Material beamMaterial;
-
     [Header("References")]
     [SerializeField] private Camera playerCamera;
     [SerializeField] private Transform beamOrigin;
-
-    [Header("Energy Settings")]
-    [SerializeField] private EnergySettings energy;
+    [SerializeField] private EnergyController energy;
 
     [Header("Light Settings")]
-    [SerializeField] private LightSettings lightSettings;
+    [SerializeField] private float maxLightRange = 6f;
+    [SerializeField] private float maxIntensity = 2f;
+    [SerializeField] private float energyPerSecond = 5f;
 
     [Header("Beam Settings")]
-    [SerializeField] private BeamSettings beamSettings;
+    [SerializeField] private float beamRange = 50f;
+    [SerializeField] private float fireRate = 0.2f;
+    [SerializeField] private float beamDuration = 0.05f;
+    [SerializeField] private float beamEnergyCost = 15f;
+    [SerializeField] private Material beamMaterial;
 
     private Light pointLight;
     private LineRenderer beamLine;
 
-    private float lightTimer = 0f;
     private float beamCooldownTimer = 0f;
-    private bool isLightActive = false;
 
     void Start()
     {
@@ -33,40 +33,33 @@ public class CubeLight : MonoBehaviour
         pointLight.enabled = false;
 
         beamLine = GetComponent<LineRenderer>();
-        beamLine.material = beamMaterial;       
+        beamLine.material = beamMaterial;
+        beamLine.startWidth = 0.15f;
+        beamLine.endWidth = 0.15f;
         beamLine.enabled = false;
-
-        beamLine.startWidth = 0.15f;  // Make the start of the beam thinner
-        beamLine.endWidth = 0.15f;    // Make the end of the beam thinner 
     }
 
     void Update()
     {
         HandleLightInput();
         HandleBeamInput();
-        UpdateLightTimer();
     }
 
     private void HandleLightInput()
     {
-        if (Input.GetMouseButton(1) && energy.Percent > 0f)
+        if (Input.GetMouseButton(1) && energy.HasEnergy(0.1f))
         {
             if (!pointLight.enabled)
                 pointLight.enabled = true;
 
-            // Drain energy over time
-            energy.Percent -= lightSettings.energyPerSecond * Time.deltaTime;
-            energy.Percent = Mathf.Max(0f, energy.Percent);
+            energy.ConsumeEnergy(energyPerSecond * Time.deltaTime);
 
-            float energyFactor = energy.Percent / 100f;
-            pointLight.range = lightSettings.maxRange * energyFactor;
-            pointLight.intensity = lightSettings.maxIntensity * energyFactor;
+            float energyFactor = energy.Percent / energy.MaxEnergy;
+            pointLight.range = maxLightRange * energyFactor;
+            pointLight.intensity = maxIntensity * energyFactor;
 
-            // Auto-disable if out of energy
-            if (energy.Percent <= 0f)
-            {
+            if (!energy.HasEnergy(0.1f))
                 pointLight.enabled = false;
-            }
         }
         else
         {
@@ -79,14 +72,12 @@ public class CubeLight : MonoBehaviour
     {
         beamCooldownTimer += Time.deltaTime;
 
-        if (Input.GetButtonDown("Fire1") && beamCooldownTimer >= beamSettings.fireRate)
+        if (Input.GetButtonDown("Fire1") && beamCooldownTimer >= fireRate)
         {
-            if (energy.Percent < beamSettings.energyCost)
-                return; // Not enough energy, don't fire
+            if (!energy.ConsumeEnergy(beamEnergyCost))
+                return;
 
             beamCooldownTimer = 0f;
-            energy.Percent -= beamSettings.energyCost;
-
             FireBeam();
         }
     }
@@ -98,7 +89,7 @@ public class CubeLight : MonoBehaviour
 
         beamLine.SetPosition(0, origin);
 
-        if (Physics.Raycast(origin, direction, out RaycastHit hit, beamSettings.range))
+        if (Physics.Raycast(origin, direction, out RaycastHit hit, beamRange))
         {
             beamLine.SetPosition(1, hit.point);
 
@@ -109,7 +100,7 @@ public class CubeLight : MonoBehaviour
         }
         else
         {
-            beamLine.SetPosition(1, origin + direction * beamSettings.range);
+            beamLine.SetPosition(1, origin + direction * beamRange);
         }
 
         StartCoroutine(ShootBeam());
@@ -118,46 +109,7 @@ public class CubeLight : MonoBehaviour
     private IEnumerator ShootBeam()
     {
         beamLine.enabled = true;
-        yield return new WaitForSeconds(beamSettings.duration);
+        yield return new WaitForSeconds(beamDuration);
         beamLine.enabled = false;
-    }
-
-    private void UpdateLightTimer()
-    {
-        if (isLightActive)
-        {
-            lightTimer -= Time.deltaTime;
-
-            if (lightTimer <= 0f)
-            {
-                pointLight.enabled = false;
-                isLightActive = false;
-            }
-        }
-    }
-
-    // -------------------- Struct Definitions --------------------
-
-    [System.Serializable]
-    private struct EnergySettings
-    {
-        [Range(0, 100)] public float Percent;
-    }
-
-    [System.Serializable]
-    private struct LightSettings
-    {
-        public float maxRange;
-        public float maxIntensity;
-        public float energyPerSecond;
-    }
-
-    [System.Serializable]
-    private struct BeamSettings
-    {
-        public float range;
-        public float fireRate;
-        public float duration;
-        public float energyCost;
     }
 }

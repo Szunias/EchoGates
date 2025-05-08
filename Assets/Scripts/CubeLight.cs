@@ -20,6 +20,7 @@ public class CubeLight : MonoBehaviour
     public float MaxIntensity = 2f; // Brightness at 100%
     public float LightDuration = 4f; // Light stays on for this duration
 
+    [Header("Beam Settings")]
     [Tooltip("Range of the beam")][SerializeField] public float soulRange = 50f;
     [Tooltip("Time between beam shots")][SerializeField] public float fireRate = 0.2f;
     [Tooltip("How long the soul activates its beam")][SerializeField] public float beamDuration = 0.05f; 
@@ -66,8 +67,11 @@ public class CubeLight : MonoBehaviour
             RaycastHit hit;
             if (Physics.Raycast(rayOrigin, playerCamera.transform.forward, out hit, soulRange))
             {
-                beamLine.SetPosition(1, hit.point);
-                Destroy(hit.transform.gameObject); //can be changed to whatever we want to do when beam hits
+                if (hit.transform.gameObject.name != "Cube") //Cube is the floor, should be changed accordingly
+                {
+                    beamLine.SetPosition(1, hit.point);
+                    Destroy(hit.transform.gameObject); //can be changed to whatever we want to do when beam hits
+                }
             }
             else
             {

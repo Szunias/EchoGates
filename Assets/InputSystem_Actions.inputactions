@@ -990,6 +990,34 @@
                     "isPartOfComposite": false
                 }
             ]
+        },
+        {
+            "name": "PlayerControls.Inputactions",
+            "id": "30b7d79e-0bd9-4c1a-a49a-0940a7c25fe7",
+            "actions": [
+                {
+                    "name": "Interact",
+                    "type": "Button",
+                    "id": "044af0af-d83d-4478-be89-ea0be766b687",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "83141659-cdad-4331-84d4-7d3173d798ca",
+                    "path": "<Keyboard>/e",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Interact",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
         }
     ],
     "controlSchemes": [

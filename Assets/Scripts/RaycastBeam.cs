@@ -32,7 +32,7 @@ public class RaycastBeam : MonoBehaviour
             if (Physics.Raycast(rayOrigin, playerCamera.transform.forward, out hit, soulRange))
             {
                 beamLine.SetPosition(1, hit.point);
-                Destroy(hit.transform.gameObject); //can be changed to whatever we want to do when beam hits
+               
             }
             else
             {

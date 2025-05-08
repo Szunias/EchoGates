@@ -1,102 +1,163 @@
-using Unity.VisualScripting;
-using System.Collections;
 using UnityEngine;
+using System.Collections;
 
-[RequireComponent(typeof(Light))]
-[RequireComponent(typeof(LineRenderer))] 
+[RequireComponent(typeof(Light), typeof(LineRenderer))]
 public class CubeLight : MonoBehaviour
 {
-    public Camera playerCamera;
-    public Transform beamOrigin;
-    public int MouseButton = 1; //for the right mouse button
+    [SerializeField] private Material beamMaterial;
+
+    [Header("References")]
+    [SerializeField] private Camera playerCamera;
+    [SerializeField] private Transform beamOrigin;
 
     [Header("Energy Settings")]
-    [Range(0, 100)]
-    public float EnergyPercent = 100f; // Total energy left (0–100%)
-    public float EnergyDrainPerUse = 10f; // Energy used per cast
+    [SerializeField] private EnergySettings energy;
 
     [Header("Light Settings")]
-    public float MaxRange = 6f; // Light radius at 100%
-    public float MaxIntensity = 2f; // Brightness at 100%
-    public float LightDuration = 4f; // Light stays on for this duration
+    [SerializeField] private LightSettings lightSettings;
 
     [Header("Beam Settings")]
-    [Tooltip("Range of the beam")][SerializeField] public float soulRange = 50f;
-    [Tooltip("Time between beam shots")][SerializeField] public float fireRate = 0.2f;
-    [Tooltip("How long the soul activates its beam")][SerializeField] public float beamDuration = 0.05f; 
+    [SerializeField] private BeamSettings beamSettings;
 
-    private Light LightCube;
-    private float LightTimer = 0f;
-    private bool IsCasting = false;
+    private Light pointLight;
+    private LineRenderer beamLine;
 
-    LineRenderer beamLine;
-    float fireTimer;
+    private float lightTimer = 0f;
+    private float beamCooldownTimer = 0f;
+    private bool isLightActive = false;
 
     void Start()
     {
+        pointLight = GetComponent<Light>();
+        pointLight.type = LightType.Point;
+        pointLight.enabled = false;
+
         beamLine = GetComponent<LineRenderer>();
-        LightCube = GetComponent<Light>();
-        LightCube.type = LightType.Point;
-        LightCube.enabled = false;
+        beamLine.material = beamMaterial;       
+        beamLine.enabled = false;
+
+        beamLine.startWidth = 0.15f;  // Make the start of the beam thinner
+        beamLine.endWidth = 0.15f;    // Make the end of the beam thinner 
     }
 
     void Update()
     {
-        if (Input.GetMouseButtonDown(MouseButton))
+        HandleLightInput();
+        HandleBeamInput();
+        UpdateLightTimer();
+    }
+
+    private void HandleLightInput()
+    {
+        if (Input.GetMouseButton(1) && energy.Percent > 0f)
         {
-            if (!IsCasting && EnergyPercent >= EnergyDrainPerUse)
+            if (!pointLight.enabled)
+                pointLight.enabled = true;
+
+            // Drain energy over time
+            energy.Percent -= lightSettings.energyPerSecond * Time.deltaTime;
+            energy.Percent = Mathf.Max(0f, energy.Percent);
+
+            float energyFactor = energy.Percent / 100f;
+            pointLight.range = lightSettings.maxRange * energyFactor;
+            pointLight.intensity = lightSettings.maxIntensity * energyFactor;
+
+            // Auto-disable if out of energy
+            if (energy.Percent <= 0f)
             {
-                IsCasting = true;
-                LightTimer = LightDuration;
-
-                EnergyPercent -= EnergyDrainPerUse;
-                float energyFactor = EnergyPercent / 100f;
-
-                LightCube.range = MaxRange * energyFactor; 
-                LightCube.intensity = MaxIntensity * energyFactor;
-                LightCube.enabled = true;
+                pointLight.enabled = false;
             }
         }
-
-        fireTimer += Time.deltaTime;
-        if (Input.GetButtonDown("Fire1") && fireTimer > fireRate) //Fire1 is equal to right click
+        else
         {
-            fireTimer = 0;
-            beamLine.SetPosition(0, beamOrigin.position);
-            Vector3 rayOrigin = playerCamera.ViewportToWorldPoint(new Vector3(0.5f, 0.5f, 0));
-            RaycastHit hit;
-            if (Physics.Raycast(rayOrigin, playerCamera.transform.forward, out hit, soulRange))
-            {
-                if (hit.transform.gameObject.name != "Cube") //Cube is the floor, should be changed accordingly
-                {
-                    beamLine.SetPosition(1, hit.point);
-                    Destroy(hit.transform.gameObject); //can be changed to whatever we want to do when beam hits
-                }
-            }
-            else
-            {
-                beamLine.SetPosition(1, rayOrigin + (playerCamera.transform.forward * soulRange));
-            }
-            StartCoroutine(ShootBeam());
+            if (pointLight.enabled)
+                pointLight.enabled = false;
         }
+    }
 
-        IEnumerator ShootBeam()
+    private void HandleBeamInput()
+    {
+        beamCooldownTimer += Time.deltaTime;
+
+        if (Input.GetButtonDown("Fire1") && beamCooldownTimer >= beamSettings.fireRate)
         {
-            beamLine.enabled = true;
-            yield return new WaitForSeconds(beamDuration);
-            beamLine.enabled = false;
-        } 
+            if (energy.Percent < beamSettings.energyCost)
+                return; // Not enough energy, don't fire
 
-        // Timer countdown
-        if (IsCasting)
+            beamCooldownTimer = 0f;
+            energy.Percent -= beamSettings.energyCost;
+
+            FireBeam();
+        }
+    }
+
+    private void FireBeam()
+    {
+        Vector3 origin = beamOrigin.position;
+        Vector3 direction = playerCamera.transform.forward;
+
+        beamLine.SetPosition(0, origin);
+
+        if (Physics.Raycast(origin, direction, out RaycastHit hit, beamSettings.range))
         {
-            LightTimer -= Time.deltaTime;
+            beamLine.SetPosition(1, hit.point);
 
-            if (LightTimer <= 0f)
+            if (hit.transform.CompareTag("Enemy"))
             {
-                LightCube.enabled = false;
-                IsCasting = false;
+                Destroy(hit.transform.gameObject);
             }
         }
+        else
+        {
+            beamLine.SetPosition(1, origin + direction * beamSettings.range);
+        }
+
+        StartCoroutine(ShootBeam());
+    }
+
+    private IEnumerator ShootBeam()
+    {
+        beamLine.enabled = true;
+        yield return new WaitForSeconds(beamSettings.duration);
+        beamLine.enabled = false;
+    }
+
+    private void UpdateLightTimer()
+    {
+        if (isLightActive)
+        {
+            lightTimer -= Time.deltaTime;
+
+            if (lightTimer <= 0f)
+            {
+                pointLight.enabled = false;
+                isLightActive = false;
+            }
+        }
+    }
+
+    // -------------------- Struct Definitions --------------------
+
+    [System.Serializable]
+    private struct EnergySettings
+    {
+        [Range(0, 100)] public float Percent;
+    }
+
+    [System.Serializable]
+    private struct LightSettings
+    {
+        public float maxRange;
+        public float maxIntensity;
+        public float energyPerSecond;
+    }
+
+    [System.Serializable]
+    private struct BeamSettings
+    {
+        public float range;
+        public float fireRate;
+        public float duration;
+        public float energyCost;
     }
 }

@@ -246,7 +246,7 @@ Transform:
   m_GameObject: {fileID: 601532313}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.08, y: 0.47, z: 0.08}
+  m_LocalPosition: {x: -0.08, y: 0.6, z: 0.08}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -263,6 +263,7 @@ GameObject:
   - component: {fileID: 632498707}
   - component: {fileID: 632498706}
   - component: {fileID: 632498705}
+  - component: {fileID: 632498709}
   - component: {fileID: 632498704}
   - component: {fileID: 632498708}
   m_Layer: 0
@@ -291,7 +292,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 10, y: 2.44, z: 10}
+  m_Size: {x: 10, y: 1.5, z: 10}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!23 &632498705
 MeshRenderer:
@@ -378,6 +379,29 @@ MonoBehaviour:
   chargeAmount: 100
   spawnPoint: {fileID: 601532314}
   chargeablePrefab: {fileID: 2354324599331993152, guid: 088063189c4c96645ad8277ee3e0e32c, type: 3}
+  chargeSpeed: 50
+  interactAction: {fileID: 6800353346499407697, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+--- !u!65 &632498709
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 632498703}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1001 &1077787846
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -556,9 +580,9 @@ RectTransform:
   - {fileID: 1862988051}
   m_Father: {fileID: 246832039}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -302.5, y: -156.31}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 95.73999, y: 33.690002}
   m_SizeDelta: {x: 160, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1275053914

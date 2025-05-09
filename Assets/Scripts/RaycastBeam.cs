@@ -32,7 +32,11 @@ public class RaycastBeam : MonoBehaviour
             if (Physics.Raycast(rayOrigin, playerCamera.transform.forward, out hit, soulRange))
             {
                 beamLine.SetPosition(1, hit.point);
-               
+                if (hit.collider.tag == "Totem")
+                {
+                    GameObject objectHit = hit.collider.gameObject;
+                    objectHit.GetComponentInParent<TotemLightingUp>().LightUp();
+                }
             }
             else
             {

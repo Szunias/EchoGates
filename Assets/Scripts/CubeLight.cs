@@ -10,15 +10,15 @@ public class CubeLight : MonoBehaviour
     [SerializeField] private EnergyController energy;
 
     [Header("Light Settings")]
-    [SerializeField] private float maxLightRange = 6f;
-    [SerializeField] private float maxIntensity = 2f;
-    [SerializeField] private float energyPerSecond = 5f;
+    [SerializeField] private float maxLightRange = 15f;
+    [SerializeField] private float maxIntensity = 100f;
+    [SerializeField] private float energyPerSecond = 2f;
 
     [Header("Beam Settings")]
-    [SerializeField] private float beamRange = 50f;
-    [SerializeField] private float fireRate = 0.2f;
-    [SerializeField] private float beamDuration = 0.05f;
-    [SerializeField] private float beamEnergyCost = 15f;
+    [SerializeField] private float beamRange = 100f;
+    [SerializeField] private float fireRate = 0.5f;
+    [SerializeField] private float beamDuration = 0.5f;
+    [SerializeField] private float beamEnergyCost = 10f;
     [SerializeField] private Material beamMaterial;
 
     private Light pointLight;
@@ -28,6 +28,10 @@ public class CubeLight : MonoBehaviour
 
     void Start()
     {
+        //to hide the cursor and lock it to the center of the screen (where the crosshair is)
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+
         pointLight = GetComponent<Light>();
         pointLight.type = LightType.Point;
         pointLight.enabled = false;
@@ -54,7 +58,7 @@ public class CubeLight : MonoBehaviour
 
             energy.ConsumeEnergy(energyPerSecond * Time.deltaTime);
 
-            float energyFactor = energy.Percent / energy.MaxEnergy;
+            float energyFactor = (energy.Percent + 25) / energy.MaxEnergy; //the +25 is so that  the pointlight doesn't get too small when energy is low
             pointLight.range = maxLightRange * energyFactor;
             pointLight.intensity = maxIntensity * energyFactor;
 
@@ -84,14 +88,14 @@ public class CubeLight : MonoBehaviour
 
     private void FireBeam()
     {
-        Vector3 origin = beamOrigin.position;
-        Vector3 direction = playerCamera.transform.forward;
+        Ray ray = playerCamera.ScreenPointToRay(new Vector3(Screen.width / 2, Screen.height / 2));
+        beamLine.SetPosition(0, beamOrigin.position);
 
-        beamLine.SetPosition(0, origin);
+        Vector3 hitPoint;
 
-        if (Physics.Raycast(origin, direction, out RaycastHit hit, beamRange))
+        if (Physics.Raycast(ray, out RaycastHit hit, beamRange))
         {
-            beamLine.SetPosition(1, hit.point);
+            hitPoint = hit.point;
 
             if (hit.transform.CompareTag("Enemy"))
             {
@@ -100,9 +104,10 @@ public class CubeLight : MonoBehaviour
         }
         else
         {
-            beamLine.SetPosition(1, origin + direction * beamRange);
+            hitPoint = ray.origin + ray.direction * beamRange;
         }
 
+        beamLine.SetPosition(1, hitPoint);
         StartCoroutine(ShootBeam());
     }
 

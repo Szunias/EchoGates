@@ -375,7 +375,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6f75a5930c743c349be9997b2d0b695d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rechargeAmount: 100
+  playerEnergy: {fileID: 1242514980}
+  energyReward: 25
+  chargeAmount: 100
+  chargeSpeed: 10
+  spawnPoint: {fileID: 601532314}
+  chargeablePrefab: {fileID: 3044775352067503198, guid: 57a76f8ab0ecc2342bd60f86d8304506, type: 3}
+  interactAction: {fileID: -7898977888173200157, guid: 93dc519228223e44a9921074be139963, type: 3}
 --- !u!65 &632498709
 BoxCollider:
   m_ObjectHideFlags: 0

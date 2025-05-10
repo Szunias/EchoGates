@@ -99,9 +99,15 @@ public class CubeLight : MonoBehaviour
         {
             hitPoint = hit.point;
 
-            if (hit.transform.CompareTag("Enemy"))
+            // Debugging hit information
+            Debug.Log("Raycast hit: " + hit.transform.name);  // Log the name of the object hit
+
+            // Check if we hit the totem (with TotemLightingUp script)
+            TotemLightingUp totem = hit.transform.GetComponent<TotemLightingUp>();
+            if (totem != null)
             {
-                Destroy(hit.transform.gameObject);
+                Debug.Log("Totem hit, calling LightUp()");  // Log when Totem is hit
+                totem.LightUp();
             }
         }
         else

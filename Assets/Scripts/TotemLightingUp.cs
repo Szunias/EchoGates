@@ -1,11 +1,11 @@
-using System.Collections;
+using System.Collections;  // Ensure this is here for IEnumerator and coroutines
 using UnityEngine;
 
 public class TotemLightingUp : MonoBehaviour
 {
     [Header("Totem Settings")]
-    [Tooltip("Amount of time for each level to light up")] [SerializeField] public float totemTime = 0.5f; 
-    [Tooltip("Material used for the totem to light up")] [SerializeField] private Material lightUpMaterial;
+    [SerializeField] private float totemTime = 0.5f; // Time to light up each layer
+    [SerializeField] private Material lightUpMaterial;
 
     [Header("Totem Game Objects")]
     [SerializeField] private GameObject level1;
@@ -13,51 +13,48 @@ public class TotemLightingUp : MonoBehaviour
     [SerializeField] private GameObject level3;
     [SerializeField] private GameObject level4;
 
-    private bool isRunning = true;
-    private bool isLit = false;
-    private int layers = 4;
+    private int currentLayer = 0;
+    private bool isCoolingDown = false;
 
-    public void Update()
-    {
-           if (isLit)
-        {
-            if (isRunning)
-            {
-                if (layers == 4)
-                {
-                    level4.GetComponent<MeshRenderer>().material = lightUpMaterial;
-                }
-                else if (layers == 3)
-                {
-                    level3.GetComponent<MeshRenderer>().material = lightUpMaterial;
-
-                }
-                else if (layers == 2)
-                {
-                    level2.GetComponent<MeshRenderer>().material = lightUpMaterial;
-                }
-                else
-                {
-                    level1.GetComponent<MeshRenderer>().material = lightUpMaterial;
-                }
-                layers--;
-                StartCoroutine(StartCooldown());
-            }
-        }
-    }
-
+    // This method will be called to light up the totem
     public void LightUp()
     {
-        isLit = true;
+        if (isCoolingDown || currentLayer >= 4)
+            return; // If it's cooling down or all layers are lit, stop.
+
+        StartCoroutine(LightNextLayer()); // Start coroutine to light up the next layer
     }
 
-    IEnumerator StartCooldown()
+    // Coroutine to light up one layer of the totem
+    private IEnumerator LightNextLayer()
     {
-        isRunning = false;
+        isCoolingDown = true;
 
-        yield return new WaitForSeconds(totemTime);
+        // Lighting up the appropriate layer based on currentLayer
+        if (currentLayer == 0)
+        {
+            level1.GetComponent<MeshRenderer>().material = lightUpMaterial;
+            Debug.Log("Lit level 1");
+        }
+        else if (currentLayer == 1)
+        {
+            level2.GetComponent<MeshRenderer>().material = lightUpMaterial;
+            Debug.Log("Lit level 2");
+        }
+        else if (currentLayer == 2)
+        {
+            level3.GetComponent<MeshRenderer>().material = lightUpMaterial;
+            Debug.Log("Lit level 3");
+        }
+        else if (currentLayer == 3)
+        {
+            level4.GetComponent<MeshRenderer>().material = lightUpMaterial;
+            Debug.Log("Lit level 4");
+        }
 
-        isRunning = true;
+        currentLayer++;  // Move to the next layer
+        yield return new WaitForSeconds(totemTime);  // Wait for the specified time before lighting up next layer
 
+        isCoolingDown = false; // Cooldown finished, ready to light the next layer
     }
 }

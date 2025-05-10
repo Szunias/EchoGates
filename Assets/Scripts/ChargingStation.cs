@@ -24,6 +24,8 @@ public class ChargingStation : MonoBehaviour
     private Vector3 originalPosition;
     private Quaternion originalRotation;
 
+    private CubeLight cubeLightScript;
+
     private void OnEnable()
     {
         if(interactAction == null || interactAction.action == null)
@@ -81,9 +83,6 @@ public class ChargingStation : MonoBehaviour
             Debug.LogError("Player cube not assigned.");
             return;
         }
-        {
-            
-        }
 
         //originalParent = playerCube.transform.parent;
 
@@ -92,6 +91,13 @@ public class ChargingStation : MonoBehaviour
         playerCube.transform.localRotation = Quaternion.identity;
 
         _placedObject = playerCube;
+
+        cubeLightScript = _placedObject.GetComponent<CubeLight>();
+        if (cubeLightScript != null)
+        {
+            cubeLightScript.enabled = false;
+        }
+
         isObjectPlaced = true;
 
         Debug.Log("Placed object: " + _placedObject);
@@ -126,6 +132,12 @@ public class ChargingStation : MonoBehaviour
             _placedObject.transform.localRotation = Quaternion.identity;
 
             //Destroy(_placedObject);
+
+            cubeLightScript = _placedObject?.GetComponent<CubeLight>();
+            if (cubeLightScript != null)
+            {
+                cubeLightScript.enabled = true;
+            }
 
             _placedObject = null;
             isObjectPlaced = false;

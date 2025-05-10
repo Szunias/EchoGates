@@ -6,28 +6,42 @@ using System.Collections;
 public class ChargingStation : MonoBehaviour
 {
     [SerializeField] private EnergyController playerEnergy;
+    [SerializeField] GameObject playerCube;
     [SerializeField] private float energyReward = 25f;
     [SerializeField] public float chargeAmount = 100f; 
     [SerializeField] private float chargeSpeed = 10f;
 
     private bool playerInRange = false;
-    private GameObject placedObject;
+    private GameObject _placedObject;
     private bool isObjectPlaced = false;
 
     [SerializeField] private Transform spawnPoint;
-    [SerializeField] private GameObject chargeablePrefab;
+    //[SerializeField] private GameObject chargeablePrefab;
     [SerializeField] private InputActionReference interactAction;
+
+    private Transform originalParent;
+    [SerializeField] private Transform holdPoint; 
+    private Vector3 originalPosition;
+    private Quaternion originalRotation;
 
     private void OnEnable()
     {
+        if(interactAction == null || interactAction.action == null)
+        {
+            Debug.LogError("Interaction Action is not assigned");
+            return;
+        }
         interactAction.action.performed += OnInteract;
         interactAction.action.Enable();
     }
 
     private void OnDisable()
     {
-        interactAction.action.performed -= OnInteract;
-        interactAction.action.Disable();
+        if (interactAction != null && interactAction.action != null)
+        {
+            interactAction.action.performed -= OnInteract;
+            interactAction.action.Disable();
+        }
     }
 
     private void OnInteract(InputAction.CallbackContext context)
@@ -40,7 +54,7 @@ public class ChargingStation : MonoBehaviour
 
     private void HandleInteraction()
     {
-        if (placedObject == null)
+        if (_placedObject == null)
         {
             SpawnObject();
         }
@@ -62,10 +76,25 @@ public class ChargingStation : MonoBehaviour
             return;
         }
 
-        placedObject = Instantiate(chargeablePrefab, spawnPoint.position, spawnPoint.rotation);
+        if ( playerCube == null)
+        {
+            Debug.LogError("Player cube not assigned.");
+            return;
+        }
+        {
+            
+        }
+
+        //originalParent = playerCube.transform.parent;
+
+        playerCube.transform.SetParent(spawnPoint);
+        playerCube.transform.localPosition = Vector3.zero;
+        playerCube.transform.localRotation = Quaternion.identity;
+
+        _placedObject = playerCube;
         isObjectPlaced = true;
 
-        Debug.Log("Placed object: " + placedObject);
+        Debug.Log("Placed object: " + _placedObject);
         Debug.Log("Object placed on charging station.");
 
         StartCoroutine(ChargeObject());
@@ -87,15 +116,20 @@ public class ChargingStation : MonoBehaviour
 
     private void RetrieveObject()
     {
-        if (placedObject != null && playerEnergy.Percent >= chargeAmount)
+        if (_placedObject != null && playerEnergy.Percent >= chargeAmount)
         {
-            Debug.Log("Placed object: " + placedObject);
+            Debug.Log("Placed object: " + _placedObject);
             Debug.Log("Destroying placed object...");
 
-            Destroy(placedObject);
+            _placedObject.transform.SetParent(holdPoint);
+            _placedObject.transform.localPosition = new Vector3(0.671000004f, -0.247999996f, 0.0189999994f);
+            _placedObject.transform.localRotation = Quaternion.identity;
 
-            placedObject = null;
+            //Destroy(_placedObject);
+
+            _placedObject = null;
             isObjectPlaced = false;
+
             playerEnergy.AddEnergy(energyReward);
             Debug.Log("Energy added to player. ");
         }

@@ -72,6 +72,8 @@ public class CubeLight : MonoBehaviour
         }
     }
 
+
+    //Maybe you can put this on the motherfaka with a new script (that you need to create)...
     private void HandleBeamInput()
     {
         beamCooldownTimer += Time.deltaTime;
@@ -85,7 +87,7 @@ public class CubeLight : MonoBehaviour
             FireBeam();
         }
     }
-
+    //... and also this
     private void FireBeam()
     {
         Ray ray = playerCamera.ScreenPointToRay(new Vector3(Screen.width / 2, Screen.height / 2));

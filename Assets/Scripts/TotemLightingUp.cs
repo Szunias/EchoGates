@@ -1,109 +1,76 @@
-﻿using System.Collections;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class TotemLightingUp : MonoBehaviour
 {
-    /* --------------------  INSPECTOR -------------------- */
-    [Header("Win UI")]
-    [SerializeField] private GameObject winScreenPanel;
-
     [Header("Totem Settings")]
-    [SerializeField] private float totemTime = 0.5f;          // czas pomiędzy warstwami
     [SerializeField] private Material lightUpMaterial;
-
-    [Header("Totem Game Objects")]
-    [SerializeField] private GameObject level1;
-    [SerializeField] private GameObject level2;
-    [SerializeField] private GameObject level3;
-    [SerializeField] private GameObject level4;
-
-    [Header("Win Scene")]
-    [Tooltip("Scena wczytywana po zapaleniu wszystkich totemów")]
     [SerializeField] private string winSceneName = "GameWon";
 
-    /* --------------------  RUNTIME -------------------- */
-    private int currentLayer = 0;
-    private bool isCoolingDown = false;
-    private bool fullyLit = false;
+    private bool isLit = false;
 
-    /* ---- statyczne śledzenie postępu gry ---- */
-    private static int totalTotems = -1;   // ustawiane raz w Awake()
-    private static int litTotems = 0;    // ile totemów już w pełni zapalonych
+    // Statyczny licznik dla wszystkich totemów
+    private static int litTotems = 0;
+    private const int REQUIRED_TOTEMS = 5;
 
-    /* =================================================== */
-    void Awake()
-    {
-        // liczymy totemy tylko raz (przy pierwszym Awake)
-        if (totalTotems < 0)
-            totalTotems = FindObjectsOfType<TotemLightingUp>().Length;
-    }
-
-    /* =================================================== */
-    /// <summary>Wywołaj tę metodę, aby zapalić kolejną warstwę.</summary>
+    // Metoda do zapalenia totemu
     public void LightUp()
     {
-        if (isCoolingDown || currentLayer >= 4)
+        // Jeśli totem jest już zapalony, nic nie rób
+        if (isLit)
             return;
 
-        StartCoroutine(LightNextLayer());
-    }
-
-    private IEnumerator LightNextLayer()
-    {
-        isCoolingDown = true;
-
-        /* ---------- zapalamy odpowiedni poziom ---------- */
-        if (currentLayer == 0)
+        // Zmień materiał totemu
+        MeshRenderer renderer = GetComponent<MeshRenderer>();
+        if (renderer != null)
         {
-            level1.GetComponent<MeshRenderer>().material = lightUpMaterial;
-            EnableLight(level1);
-        }
-        else if (currentLayer == 1)
-        {
-            level2.GetComponent<MeshRenderer>().material = lightUpMaterial;
-            EnableLight(level2);
-        }
-        else if (currentLayer == 2)
-        {
-            level3.GetComponent<MeshRenderer>().material = lightUpMaterial;
-            EnableLight(level3);
-        }
-        else if (currentLayer == 3)
-        {
-            level4.GetComponent<MeshRenderer>().material = lightUpMaterial;
-            EnableLight(level4);
+            renderer.material = lightUpMaterial;
         }
 
-        currentLayer++;
+        // Włącz światło, jeśli istnieje
+        Light light = GetComponent<Light>();
+        if (light != null)
+        {
+            light.enabled = true;
+        }
 
-        /* ---------- totem w pełni zapalony? ---------- */
-        if (currentLayer >= 4 && !fullyLit)
-            OnTotemFullyLit();
-
-        yield return new WaitForSeconds(totemTime);
-        isCoolingDown = false;
-    }
-
-    /* =================================================== */
-    private void EnableLight(GameObject levelObj)
-    {
-        Light l = levelObj.GetComponent<Light>();
-        if (l != null) l.enabled = true;
-    }
-
-    private void OnTotemFullyLit()
-    {
-        fullyLit = true;
+        // Oznacz totem jako zapalony
+        isLit = true;
         litTotems++;
 
-        if (litTotems >= totalTotems)
-        {
-            // wszystkie totemy gotowe → wygrana
-            //SceneManager.LoadScene(winSceneName);
+        Debug.Log($"Totem zapalony! Aktualna liczba: {litTotems}/{REQUIRED_TOTEMS}");
 
-            winScreenPanel.SetActive(true);
-            Time.timeScale = 0f; //pause the game
+        // Sprawdź, czy wszystkie totemy są zapalone
+        if (litTotems >= REQUIRED_TOTEMS)
+        {
+            Debug.Log("Wszystkie totemy zapalone! Wczytywanie sceny: " + winSceneName);
+            SceneManager.LoadScene(winSceneName);
         }
+    }
+
+    // Możesz dodać tę metodę, jeśli totem jest aktywowany przez strzał
+    // Przykład: Totem reaguje na kolizję pocisku z tagiem "Bullet"
+    void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("Bullet"))
+        {
+            LightUp();
+        }
+    }
+
+    // Alternatywna metoda, jeśli używasz triggerów
+    void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Bullet"))
+        {
+            LightUp();
+        }
+    }
+
+    // Metoda do resetowania stanu totemów (opcjonalna)
+    public static void ResetTotemProgress()
+    {
+        litTotems = 0;
+        Debug.Log("Zresetowano postęp totemów");
     }
 }

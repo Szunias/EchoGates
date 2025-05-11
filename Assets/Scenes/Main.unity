@@ -2395,7 +2395,7 @@ LineRenderer:
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: 1
+        value: 0
         inSlope: 0
         outSlope: 0
         tangentMode: 0
@@ -3766,6 +3766,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 95381010092799602, guid: 98db70db9a0b3b3459e4293c1a6e5e11, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2340253973883101823, guid: 98db70db9a0b3b3459e4293c1a6e5e11, type: 3}
       propertyPath: m_LocalPosition.x
       value: 11.6298485
@@ -3874,6 +3878,10 @@ PrefabInstance:
       propertyPath: energy
       value: 
       objectReference: {fileID: 1397483344}
+    - target: {fileID: 8615350157675523282, guid: 98db70db9a0b3b3459e4293c1a6e5e11, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 0}
     - {fileID: 3589377358574834142, guid: 98db70db9a0b3b3459e4293c1a6e5e11, type: 3}

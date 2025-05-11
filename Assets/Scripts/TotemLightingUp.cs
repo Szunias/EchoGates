@@ -5,6 +5,9 @@ using UnityEngine.SceneManagement;
 public class TotemLightingUp : MonoBehaviour
 {
     /* --------------------  INSPECTOR -------------------- */
+    [Header("Win UI")]
+    [SerializeField] private GameObject winScreenPanel;
+
     [Header("Totem Settings")]
     [SerializeField] private float totemTime = 0.5f;          // czas pomiędzy warstwami
     [SerializeField] private Material lightUpMaterial;
@@ -97,7 +100,10 @@ public class TotemLightingUp : MonoBehaviour
         if (litTotems >= totalTotems)
         {
             // wszystkie totemy gotowe → wygrana
-            SceneManager.LoadScene(winSceneName);
+            //SceneManager.LoadScene(winSceneName);
+
+            winScreenPanel.SetActive(true);
+            Time.timeScale = 0f; //pause the game
         }
     }
 }

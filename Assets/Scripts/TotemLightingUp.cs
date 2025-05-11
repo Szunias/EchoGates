@@ -1,10 +1,12 @@
-using System.Collections;  // Ensure this is here for IEnumerator and coroutines
+﻿using System.Collections;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class TotemLightingUp : MonoBehaviour
 {
+    /* --------------------  INSPECTOR -------------------- */
     [Header("Totem Settings")]
-    [SerializeField] private float totemTime = 0.5f; // Time to light up each layer
+    [SerializeField] private float totemTime = 0.5f;          // czas pomiędzy warstwami
     [SerializeField] private Material lightUpMaterial;
 
     [Header("Totem Game Objects")]
@@ -13,48 +15,89 @@ public class TotemLightingUp : MonoBehaviour
     [SerializeField] private GameObject level3;
     [SerializeField] private GameObject level4;
 
+    [Header("Win Scene")]
+    [Tooltip("Scena wczytywana po zapaleniu wszystkich totemów")]
+    [SerializeField] private string winSceneName = "GameWon";
+
+    /* --------------------  RUNTIME -------------------- */
     private int currentLayer = 0;
     private bool isCoolingDown = false;
+    private bool fullyLit = false;
 
-    // This method will be called to light up the totem
+    /* ---- statyczne śledzenie postępu gry ---- */
+    private static int totalTotems = -1;   // ustawiane raz w Awake()
+    private static int litTotems = 0;    // ile totemów już w pełni zapalonych
+
+    /* =================================================== */
+    void Awake()
+    {
+        // liczymy totemy tylko raz (przy pierwszym Awake)
+        if (totalTotems < 0)
+            totalTotems = FindObjectsOfType<TotemLightingUp>().Length;
+    }
+
+    /* =================================================== */
+    /// <summary>Wywołaj tę metodę, aby zapalić kolejną warstwę.</summary>
     public void LightUp()
     {
         if (isCoolingDown || currentLayer >= 4)
-            return; // If it's cooling down or all layers are lit, stop.
+            return;
 
-        StartCoroutine(LightNextLayer()); // Start coroutine to light up the next layer
+        StartCoroutine(LightNextLayer());
     }
 
-    // Coroutine to light up one layer of the totem
     private IEnumerator LightNextLayer()
     {
         isCoolingDown = true;
 
-        // Lighting up the appropriate layer based on currentLayer
+        /* ---------- zapalamy odpowiedni poziom ---------- */
         if (currentLayer == 0)
         {
             level1.GetComponent<MeshRenderer>().material = lightUpMaterial;
-            Debug.Log("Lit level 1");
+            EnableLight(level1);
         }
         else if (currentLayer == 1)
         {
             level2.GetComponent<MeshRenderer>().material = lightUpMaterial;
-            Debug.Log("Lit level 2");
+            EnableLight(level2);
         }
         else if (currentLayer == 2)
         {
             level3.GetComponent<MeshRenderer>().material = lightUpMaterial;
-            Debug.Log("Lit level 3");
+            EnableLight(level3);
         }
         else if (currentLayer == 3)
         {
             level4.GetComponent<MeshRenderer>().material = lightUpMaterial;
-            Debug.Log("Lit level 4");
+            EnableLight(level4);
         }
 
-        currentLayer++;  // Move to the next layer
-        yield return new WaitForSeconds(totemTime);  // Wait for the specified time before lighting up next layer
+        currentLayer++;
 
-        isCoolingDown = false; // Cooldown finished, ready to light the next layer
+        /* ---------- totem w pełni zapalony? ---------- */
+        if (currentLayer >= 4 && !fullyLit)
+            OnTotemFullyLit();
+
+        yield return new WaitForSeconds(totemTime);
+        isCoolingDown = false;
+    }
+
+    /* =================================================== */
+    private void EnableLight(GameObject levelObj)
+    {
+        Light l = levelObj.GetComponent<Light>();
+        if (l != null) l.enabled = true;
+    }
+
+    private void OnTotemFullyLit()
+    {
+        fullyLit = true;
+        litTotems++;
+
+        if (litTotems >= totalTotems)
+        {
+            // wszystkie totemy gotowe → wygrana
+            SceneManager.LoadScene(winSceneName);
+        }
     }
 }

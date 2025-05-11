@@ -32,8 +32,8 @@ Transform:
   m_GameObject: {fileID: 2083922199197034745}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -39.3, y: 1.21, z: 2.9970121}
-  m_LocalScale: {x: 5.2235985, y: 5.2235985, z: 5.2235985}
+  m_LocalPosition: {x: -39.3, y: 1.18, z: 2.9970121}
+  m_LocalScale: {x: 8.547896, y: 8.547896, z: 8.547896}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -110,7 +110,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
+  m_Size: {x: 0.5, y: 1, z: 0.5}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &1717615166276775235
 MonoBehaviour:
@@ -141,6 +141,7 @@ MonoBehaviour:
   teleportCooldown: 5
   teleportMinDist: 3
   teleportMaxDist: 8
+  gracePeriod: 10
   player: {fileID: 0}
   deathScene: 
 --- !u!195 &4753243531579135699
@@ -176,7 +177,7 @@ Light:
   serializedVersion: 11
   m_Type: 2
   m_Color: {r: 0.93207544, g: 0, b: 0, a: 1}
-  m_Intensity: 1
+  m_Intensity: 9
   m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208

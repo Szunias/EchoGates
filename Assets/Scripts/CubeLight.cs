@@ -1,9 +1,10 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using System.Collections;
 
 [RequireComponent(typeof(Light), typeof(LineRenderer))]
 public class CubeLight : MonoBehaviour
 {
+    /* --------------------  INSPECTOR -------------------- */
     [Header("References")]
     [SerializeField] private Camera playerCamera;
     [SerializeField] private Transform beamOrigin;
@@ -12,23 +13,30 @@ public class CubeLight : MonoBehaviour
     [Header("Light Settings")]
     [SerializeField] private float maxLightRange = 15f;
     [SerializeField] private float maxIntensity = 100f;
-    [SerializeField] private float energyPerSecond = 2f;
+    [SerializeField] private float energyPerSec = 2f;
 
-    [Header("Beam Settings")]
-    [SerializeField] private float beamRange = 100f;
+    [Header("Beam Settings (LMB)")]
+    [Tooltip("Maksymalny zasiÄ™g promienia â€“ edytowalny")]
+    [SerializeField] private float beamRange = 25f;
     [SerializeField] private float fireRate = 0.5f;
     [SerializeField] private float beamDuration = 0.5f;
     [SerializeField] private float beamEnergyCost = 10f;
     [SerializeField] private Material beamMaterial;
 
+    [Header("Stun Settings (PPM)")]
+    [Tooltip("JeÅ›li OFF â€“ uÅ¼yj pointLight.range")]
+    [SerializeField] private bool useManualStunRadius = false;
+    [SerializeField] private float manualStunRadius = 7f;
+    [SerializeField] private bool debugStunSphere = true;
+
+    /* --------------------  RUNTIME -------------------- */
     private Light pointLight;
     private LineRenderer beamLine;
+    private float beamCooldown = 0f;
 
-    private float beamCooldownTimer = 0f;
-
+    /* =================================================== */
     void Start()
     {
-        //to hide the cursor and lock it to the center of the screen (where the crosshair is)
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
 
@@ -45,87 +53,73 @@ public class CubeLight : MonoBehaviour
 
     void Update()
     {
-        HandleLightInput();
-        HandleBeamInput();
+        HandlePointLight(); // PPM
+        HandleBeam();       // LPM
     }
 
-    private void HandleLightInput()
+    /* ==================  PPM  ================== */
+    private void HandlePointLight()
     {
-        bool rightMouseDown = Input.GetMouseButton(1);
-        bool hasEnoughEnergy = energy.HasEnergy(0.1f);
-        // Debug.Log($"Right Mouse: {rightMouseDown}, Has Energy: {hasEnoughEnergy}, Current Energy: {energy.Percent}");
+        bool rmbHeld = Input.GetMouseButton(1);
+        bool enoughEnergy = energy.HasEnergy(0.1f);
 
-        if (rightMouseDown && hasEnoughEnergy)
+        if (rmbHeld && enoughEnergy)
         {
-            if (!pointLight.enabled)
-            {
-                pointLight.enabled = true;
-                Debug.Log("Point light ENABLED");
-            }
+            if (!pointLight.enabled) pointLight.enabled = true;
 
-            energy.ConsumeEnergy(energyPerSecond * Time.deltaTime);
+            energy.ConsumeEnergy(energyPerSec * Time.deltaTime);
 
-            float energyFactor = (energy.Percent + 25) / energy.MaxEnergy;
-            pointLight.range = maxLightRange * energyFactor;
-            pointLight.intensity = maxIntensity * energyFactor;
-            // Debug.Log($"EnergyFactor: {energyFactor}, Range: {pointLight.range}, Intensity: {pointLight.intensity}");
+            /* ÅšwiatÅ‚o skaluje siÄ™ z poziomem energii */
+            float factor = (energy.Percent + 25f) / energy.MaxEnergy;
+            pointLight.range = maxLightRange * factor;
+            pointLight.intensity = maxIntensity * factor;
 
-            if (!energy.HasEnergy(0.1f)) // Ponownie sprawdŸ po zu¿yciu
-            {
-                if (pointLight.enabled) // Wy³¹cz tylko jeœli by³o w³¹czone
-                {
-                    pointLight.enabled = false;
-                    Debug.Log("Point light DISABLED (energy depleted during use)");
-                }
-            }
-        }
-        else
-        {
-            if (pointLight.enabled)
-            {
+            /* --- STUN W OBRÄ˜BIE AKTYWNEGO PROMIENIA --- */
+            float stunRadius = useManualStunRadius ? manualStunRadius : pointLight.range;
+            StunSpidersInArea(stunRadius, 3f);
+
+            if (!energy.HasEnergy(0.1f))
                 pointLight.enabled = false;
-                Debug.Log("Point light DISABLED (mouse up or no initial energy)");
-            }
+        }
+        else if (pointLight.enabled)
+        {
+            pointLight.enabled = false;
         }
     }
 
-
-    //Maybe you can put this on the motherfaka with a new script (that you need to create)...
-    private void HandleBeamInput()
+    /* ==================  LPM  ================== */
+    private void HandleBeam()
     {
-        beamCooldownTimer += Time.deltaTime;
+        beamCooldown += Time.deltaTime;
 
-        if (Input.GetButtonDown("Fire1") && beamCooldownTimer >= fireRate)
+        if (Input.GetButtonDown("Fire1") && beamCooldown >= fireRate)
         {
-            if (!energy.ConsumeEnergy(beamEnergyCost))
-                return;
+            if (!energy.ConsumeEnergy(beamEnergyCost)) return;
 
-            beamCooldownTimer = 0f;
+            beamCooldown = 0f;
             FireBeam();
         }
     }
-    //... and also this
+
     private void FireBeam()
     {
-        Ray ray = playerCamera.ScreenPointToRay(new Vector3(Screen.width / 2, Screen.height / 2));
-        beamLine.SetPosition(0, beamOrigin.position);
+        Ray ray = playerCamera.ScreenPointToRay(
+            new Vector3(Screen.width / 2f, Screen.height / 2f));
 
+        beamLine.SetPosition(0, beamOrigin.position);
         Vector3 hitPoint;
 
         if (Physics.Raycast(ray, out RaycastHit hit, beamRange))
         {
             hitPoint = hit.point;
 
-            // Debugging hit information
-            Debug.Log("Raycast hit: " + hit.transform.name);  // Log the name of the object hit
+            /* 5â€‘sekundowy stun, gdy trafimy pajÄ…ka promieniem */
+            if (hit.transform.TryGetComponent<spiderAI>(out var spider))
+                spider.Stun(5f);
 
-            // Check if we hit the totem (with TotemLightingUp script)
-            TotemLightingUp totem = hit.transform.GetComponent<TotemLightingUp>();
-            if (totem != null)
-            {
-                Debug.Log("Totem hit, calling LightUp()");  // Log when Totem is hit
+            /* np. zapalanie totemu */
+            if (hit.transform.TryGetComponent<TotemLightingUp>(out var totem))
                 totem.LightUp();
-            }
         }
         else
         {
@@ -141,5 +135,30 @@ public class CubeLight : MonoBehaviour
         beamLine.enabled = true;
         yield return new WaitForSeconds(beamDuration);
         beamLine.enabled = false;
+    }
+
+    /* ==================  HELPERS  ================== */
+    private void StunSpidersInArea(float radius, float duration)
+    {
+        Collider[] cols = Physics.OverlapSphere(beamOrigin.position, radius);
+        foreach (var col in cols)
+        {
+            if (col.TryGetComponent<spiderAI>(out var spider))
+                spider.Stun(duration);
+        }
+    }
+
+    /* ==================  DEBUG  ================== */
+    void OnDrawGizmosSelected()
+    {
+        if (!debugStunSphere) return;
+
+        float radius = useManualStunRadius
+            ? manualStunRadius
+            : (Application.isPlaying && pointLight != null ? pointLight.range : maxLightRange);
+
+        Gizmos.color = Color.yellow;
+        Transform center = beamOrigin != null ? beamOrigin : transform;
+        Gizmos.DrawWireSphere(center.position, radius);
     }
 }

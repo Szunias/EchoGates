@@ -23,7 +23,7 @@ public class MessageUIManager : MonoBehaviour
     [SerializeField] private PlayerMovement playerMovement;
     [SerializeField] private CameraMovement cameraMovement;
     [SerializeField] private PlayerInput playerInput;  // jeœli u¿ywasz
-
+    [SerializeField] private EnemyAI enemy;
     private void Awake()
     {
         if (Instance != null && Instance != this) Destroy(gameObject);
@@ -56,6 +56,7 @@ public class MessageUIManager : MonoBehaviour
         if (playerInput != null) playerInput.enabled = false;
         if (playerMovement != null) playerMovement.enabled = false;
         if (cameraMovement != null) cameraMovement.enabled = false;
+        if (enemy != null) enemy.enabled = false;
 
         // Disable HUD and Inventory panels
         if (hudPanel != null) hudPanel.SetActive(false);
@@ -80,6 +81,7 @@ public class MessageUIManager : MonoBehaviour
         if (playerInput != null) playerInput.enabled = true;
         if (playerMovement != null) playerMovement.enabled = true;
         if (cameraMovement != null) cameraMovement.enabled = true;
+        if (enemy != null) enemy.enabled = true;
 
         // Re-enable HUD and Inventory panels
         if (hudPanel != null) hudPanel.SetActive(true);

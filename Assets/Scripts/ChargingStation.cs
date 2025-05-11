@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using System.Collections;
+using TMPro; // WA¯NE: Zamiast UnityEngine.UI
 
 public class ChargingStation : MonoBehaviour
 {
@@ -10,7 +11,24 @@ public class ChargingStation : MonoBehaviour
     [Tooltip("The EnergyController component on the player to refill energy")]
     [SerializeField] private EnergyController playerEnergy;
     [Tooltip("The Light component on this Charging Station that will activate during charging.")]
-    [SerializeField] private Light stationLight; // NOWA REFERENCJA
+    [SerializeField] private Light stationLight;
+
+    [Header("UI Notification (TextMeshPro)")] // Zmieniono nazwê sekcji dla jasnoœci
+    [Tooltip("TextMeshProUGUI element to display notifications.")]
+    [SerializeField] private TextMeshProUGUI notificationText; // WA¯NE: Zmieniono typ na TextMeshProUGUI
+    [Tooltip("How long the notification stays on screen (in seconds).")]
+    [SerializeField] private float notificationDisplayTime = 2.5f;
+    [Tooltip("Text displayed when cube is placed in the charger.")]
+    [SerializeField] private string putInChargerMessage = "Cube placed in charger";
+    [Tooltip("Text displayed when cube is retrieved from the charger.")]
+    [SerializeField] private string retrievedFromChargerMessage = "Cube retrieved";
+    [Tooltip("Text displayed when player has full energy")]
+    [SerializeField] private string energyFullMessage = "Energy already full!";
+    [Tooltip("Text displayed when player has no cube in hand")]
+    [SerializeField] private string noCubeMessage = "No cube in hand to place!";
+    [Tooltip("Text displayed when Cube fully charged")]
+    [SerializeField] private string cubeFullyChargedMessage = "Cube fully charged!";
+
 
     [Header("Prefabs & Points")]
     [Tooltip("Prefab of the cube to place on station")]
@@ -27,13 +45,14 @@ public class ChargingStation : MonoBehaviour
     [Tooltip("Energy restored per second while charging.")]
     [SerializeField] private float chargeSpeed = 10f;
     [Tooltip("Intensity of the station light when charging.")]
-    [SerializeField] private float chargingLightIntensity = 2f; // NOWA ZMIENNA
+    [SerializeField] private float chargingLightIntensity = 2f;
 
     private GameObject _instantiatedStationCube;
     private Coroutine _chargeCoroutine;
+    private Coroutine _notificationCoroutine;
     private bool _isCharging = false;
     private bool _playerInRange = false;
-    private float _originalLightIntensity; // Do przechowywania oryginalnej intensywnoœci, jeœli by³a > 0
+    private float _originalLightIntensity;
 
     private void Awake()
     {
@@ -51,7 +70,16 @@ public class ChargingStation : MonoBehaviour
         else
             Debug.Log("Interact Action is assigned.");
 
-        // Walidacja i inicjalizacja œwiat³a stacji
+        // Walidacja TextMeshProUGUI
+        if (notificationText == null)
+        {
+            Debug.LogError("Notification Text (TextMeshProUGUI) not assigned on ChargingStation: " + gameObject.name + ". Please assign it in the Inspector.", this);
+        }
+        else
+        {
+            notificationText.gameObject.SetActive(false); // Upewnij siê, ¿e tekst jest wy³¹czony na starcie
+        }
+
         if (stationLight == null)
         {
             Debug.LogWarning("Station Light not assigned on ChargingStation: " + gameObject.name + ". Attempting to find it on this GameObject.", this);
@@ -64,9 +92,9 @@ public class ChargingStation : MonoBehaviour
 
         if (stationLight != null)
         {
-            _originalLightIntensity = stationLight.intensity; // Zapisz oryginaln¹ intensywnoœæ
-            stationLight.enabled = false; // Domyœlnie wy³¹cz œwiat³o stacji
-            stationLight.intensity = 0;   // lub ustaw intensywnoœæ na 0
+            _originalLightIntensity = stationLight.intensity;
+            stationLight.enabled = false;
+            stationLight.intensity = 0;
             Debug.Log("Station light initialized and turned off.");
         }
     }
@@ -94,34 +122,27 @@ public class ChargingStation : MonoBehaviour
             interactAction.action.Disable();
         }
         StopChargingEffects();
-        TurnOffStationLight(); // Upewnij siê, ¿e œwiat³o jest wy³¹czone przy deaktywacji
+        TurnOffStationLight();
+        if (notificationText != null && notificationText.gameObject.activeSelf)
+        {
+            notificationText.gameObject.SetActive(false);
+        }
+        if (_notificationCoroutine != null)
+        {
+            StopCoroutine(_notificationCoroutine);
+            _notificationCoroutine = null;
+        }
     }
 
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player"))
         {
-            Debug.Log("OnTriggerEnter: Player candidate entered range. Name: " + other.gameObject.name);
-            EnergyController enteringPlayerEnergy = other.GetComponent<EnergyController>(); // Lub GetComponentInChildren jeœli trzeba
-
-            if (playerEnergy != null)
-                Debug.Log("Inspected playerEnergy object: " + playerEnergy.gameObject.name);
-            else
-                Debug.LogWarning("Inspected playerEnergy is NULL!");
-
-
+            EnergyController enteringPlayerEnergy = other.GetComponent<EnergyController>();
             if (enteringPlayerEnergy != null && enteringPlayerEnergy == playerEnergy)
             {
                 _playerInRange = true;
                 Debug.Log("Player CONFIRMED in range of Charging Station: " + other.gameObject.name);
-            }
-            else if (enteringPlayerEnergy == null)
-            {
-                Debug.LogWarning("Player tagged object (" + other.gameObject.name + ") entered range, but has no EnergyController component.");
-            }
-            else
-            {
-                Debug.LogWarning("Player tagged object (" + other.gameObject.name + ") entered range with an EnergyController, BUT it's NOT the same instance as 'playerEnergy' assigned in the Inspector. Assigned: " + (playerEnergy != null ? playerEnergy.gameObject.name : "NULL") + ", Detected: " + enteringPlayerEnergy.gameObject.name);
             }
         }
     }
@@ -130,8 +151,7 @@ public class ChargingStation : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            Debug.Log("OnTriggerExit: Player candidate exited range.");
-            EnergyController exitingPlayerEnergy = other.GetComponent<EnergyController>(); // Lub GetComponentInChildren
+            EnergyController exitingPlayerEnergy = other.GetComponent<EnergyController>();
             if (exitingPlayerEnergy != null && exitingPlayerEnergy == playerEnergy)
             {
                 _playerInRange = false;
@@ -142,82 +162,47 @@ public class ChargingStation : MonoBehaviour
 
     private void OnInteractPerformed(InputAction.CallbackContext context)
     {
-        Debug.Log("--- INTERACT ACTION PERFORMED ---");
-
-        if (!_playerInRange)
-        {
-            Debug.Log("Interact failed: Player not in range. _playerInRange is false.");
-            return;
-        }
-        if (playerEnergy == null)
-        {
-            Debug.Log("Interact failed: playerEnergy reference is null.");
-            return;
-        }
-
-        Debug.Log($"Current state: _isCharging = {_isCharging}");
+        if (!_playerInRange || playerEnergy == null) return;
 
         if (!_isCharging)
         {
-            Debug.Log("Attempting to start charging (calling TryStartCharging)...");
             TryStartCharging();
         }
         else
         {
-            Debug.Log("Already charging. Checking if energy is full to retrieve...");
-            // Pozwól graczowi odzyskaæ kostkê, nawet jeœli nie jest w pe³ni na³adowana,
-            // ale œwiat³o i nagroda bêd¹ zale¿eæ od stanu na³adowania.
-            // if (playerEnergy.Percent >= playerEnergy.MaxEnergy) // Usuniêto ten warunek, by zawsze mo¿na by³o spróbowaæ zabraæ
-            // {
             RetrieveChargedCube();
-            // }
-            // else
-            // {
-            //    Debug.Log("Charging in progress. Press E again to retrieve cube (not fully charged).");
-            // }
         }
     }
 
     private void TryStartCharging()
     {
-        Debug.Log("TryStartCharging called.");
-
         if (playerEnergy.Percent >= playerEnergy.MaxEnergy)
         {
+            ShowNotification(energyFullMessage);
             Debug.Log("TryStartCharging Aborted: Player energy is already full.");
             return;
         }
-
-        if (playerCubeInHand == null)
+        if (playerCubeInHand == null || !playerCubeInHand.activeSelf)
         {
-            Debug.Log("TryStartCharging Aborted: playerCubeInHand reference is null.");
+            ShowNotification(noCubeMessage);
+            Debug.Log("TryStartCharging Aborted: playerCubeInHand is null or inactive.");
             return;
         }
-
-        if (!playerCubeInHand.activeSelf)
-        {
-            Debug.Log("TryStartCharging Aborted: playerCubeInHand GameObject is INACTIVE. Player isn't 'holding' a cube to place.");
-            return;
-        }
-
         if (cubePrefabOnStation == null || stationCubeSpawnPoint == null)
         {
             Debug.LogError("TryStartCharging Aborted: Cube Prefab On Station or Station Cube Spawn Point is not set.", this);
             return;
         }
 
-        Debug.Log("All checks in TryStartCharging passed. Proceeding to place cube...");
-
         playerCubeInHand.SetActive(false);
-        Debug.Log("Player's cube in hand deactivated.");
-
         if (_instantiatedStationCube != null) Destroy(_instantiatedStationCube);
         _instantiatedStationCube = Instantiate(cubePrefabOnStation, stationCubeSpawnPoint.position, stationCubeSpawnPoint.rotation, stationCubeSpawnPoint);
-        Debug.Log("New cube instantiated on station at " + stationCubeSpawnPoint.name);
 
         _isCharging = true;
-        TurnOnStationLight(); // W£¥CZ ŒWIAT£O
-        Debug.Log("Charging started. _isCharging set to true. Station light turned ON.");
+        TurnOnStationLight();
+        ShowNotification(putInChargerMessage);
+        Debug.Log("Charging started. Cube placed in charger.");
+
         if (_chargeCoroutine != null) StopCoroutine(_chargeCoroutine);
         _chargeCoroutine = StartCoroutine(ChargeRoutine());
     }
@@ -225,41 +210,31 @@ public class ChargingStation : MonoBehaviour
     private IEnumerator ChargeRoutine()
     {
         Debug.Log($"ChargeRoutine started. Current Energy: {playerEnergy.Percent}/{playerEnergy.MaxEnergy}");
-        while (_isCharging && playerEnergy.Percent < playerEnergy.MaxEnergy) // Dodano warunek _isCharging
+        while (_isCharging && playerEnergy.Percent < playerEnergy.MaxEnergy)
         {
             playerEnergy.AddEnergy(chargeSpeed * Time.deltaTime);
-            // Opcjonalnie: dynamiczna zmiana œwiat³a podczas ³adowania
-            // if (stationLight != null && stationLight.enabled)
-            // {
-            //     stationLight.intensity = Mathf.Lerp(0, chargingLightIntensity, playerEnergy.Percent / playerEnergy.MaxEnergy);
-            // }
             yield return null;
         }
 
-        if (playerEnergy.Percent >= playerEnergy.MaxEnergy)
+        if (playerEnergy.Percent >= playerEnergy.MaxEnergy && _isCharging) // Dodano _isCharging, aby komunikat nie pokazywa³ siê po przerwaniu
         {
             Debug.Log("Charging complete. Player energy is full.");
-            // Opcjonalnie: zmieñ œwiat³o na "pe³ne na³adowanie", np. jaœniejsze lub inny kolor
-            // if (stationLight != null) stationLight.intensity = chargingLightIntensity * 1.5f; // Przyk³ad
+            ShowNotification(cubeFullyChargedMessage);
         }
         else if (!_isCharging)
         {
-            Debug.Log("ChargeRoutine interrupted because _isCharging became false (cube likely retrieved early).");
+            Debug.Log("ChargeRoutine interrupted (cube retrieved early or charging station disabled).");
         }
         _chargeCoroutine = null;
     }
 
     private void RetrieveChargedCube()
     {
-        Debug.Log("RetrieveChargedCube called.");
-        // Usuniêto warunek !_isCharging, bo teraz zawsze mo¿na próbowaæ zabraæ
-        // if (!_isCharging && _instantiatedStationCube == null)
-        if (_instantiatedStationCube == null) // Wystarczy sprawdziæ czy jest kostka na stacji
+        if (_instantiatedStationCube == null)
         {
             Debug.Log("RetrieveChargedCube Aborted: No cube on station to retrieve.");
             return;
         }
-
         if (playerCubeInHand == null)
         {
             Debug.LogError("RetrieveChargedCube Aborted: Player Cube In Hand reference is missing!", this);
@@ -268,34 +243,59 @@ public class ChargingStation : MonoBehaviour
 
         bool wasFullyCharged = playerEnergy.Percent >= playerEnergy.MaxEnergy;
 
-        StopChargingEffects(); // To zatrzyma korutynê ³adowania
+        // Najpierw zatrzymaj efekty ³adowania i ustaw _isCharging na false
+        // To zapobiegnie wyœwietleniu komunikatu "Cube fully charged!" jeœli gracz zabierze kostkê tu¿ przed pe³nym na³adowaniem
+        StopChargingEffects();
+        _isCharging = false; // Ustaw to PRZED potencjalnym wyœwietleniem komunikatu o pe³nym na³adowaniu w ChargeRoutine
 
-        _isCharging = false; // Ustaw _isCharging na false PRZED zniszczeniem kostki i oddaniem graczowi
-        TurnOffStationLight(); // WY£¥CZ ŒWIAT£O
-        Debug.Log("Retrieval process started. _isCharging set to false. Station light turned OFF.");
+        TurnOffStationLight();
 
-
-        if (_instantiatedStationCube != null)
-        {
-            Destroy(_instantiatedStationCube);
-            _instantiatedStationCube = null;
-            Debug.Log("Station cube destroyed.");
-        }
-
+        Destroy(_instantiatedStationCube);
+        _instantiatedStationCube = null;
         playerCubeInHand.SetActive(true);
-        Debug.Log("Player's cube in hand reactivated.");
 
-        if (wasFullyCharged && playerEnergy != null) // Nagroda tylko jeœli by³o w pe³ni na³adowane
+        if (wasFullyCharged)
         {
             playerEnergy.AddEnergy(energyRewardOnPickup);
-            Debug.Log($"Cube retrieved (was fully charged). Energy reward of {energyRewardOnPickup} applied.");
+            ShowNotification(retrievedFromChargerMessage + " (Fully Charged +Bonus)");
+            Debug.Log($"Cube retrieved (fully charged). Energy reward applied.");
         }
-        else if (playerEnergy != null)
+        else
         {
-            Debug.Log($"Cube retrieved (was not fully charged). No reward. Current Energy: {playerEnergy.Percent}");
+            ShowNotification(retrievedFromChargerMessage);
+            Debug.Log($"Cube retrieved (not fully charged).");
         }
-        // _isCharging = false; // Przeniesione wy¿ej
-        Debug.Log("Retrieval complete.");
+    }
+
+    private void ShowNotification(string message)
+    {
+        if (notificationText == null)
+        {
+            Debug.LogWarning("NotificationText (TextMeshProUGUI) is not assigned. Cannot display message: " + message);
+            return;
+        }
+
+        if (_notificationCoroutine != null)
+        {
+            StopCoroutine(_notificationCoroutine);
+        }
+        _notificationCoroutine = StartCoroutine(ShowNotificationCoroutine(message));
+    }
+
+    private IEnumerator ShowNotificationCoroutine(string message)
+    {
+        notificationText.text = message;
+        notificationText.gameObject.SetActive(true);
+
+        yield return new WaitForSeconds(notificationDisplayTime);
+
+        // Dodatkowe sprawdzenie, czy tekst nadal powinien byæ ukryty
+        // (np. jeœli w miêdzyczasie pojawi³o siê nowe powiadomienie, to ono zarz¹dza ukrywaniem)
+        if (notificationText.text == message) // Ukryj tylko jeœli to nadal ten sam komunikat
+        {
+            notificationText.gameObject.SetActive(false);
+        }
+        _notificationCoroutine = null;
     }
 
     private void StopChargingEffects()
@@ -314,11 +314,6 @@ public class ChargingStation : MonoBehaviour
         {
             stationLight.enabled = true;
             stationLight.intensity = chargingLightIntensity;
-            Debug.Log("Station light turned ON with intensity: " + chargingLightIntensity);
-        }
-        else
-        {
-            Debug.LogWarning("Attempted to turn on station light, but stationLight reference is null.");
         }
     }
 
@@ -327,19 +322,10 @@ public class ChargingStation : MonoBehaviour
         if (stationLight != null)
         {
             stationLight.enabled = false;
-            // Mo¿esz chcieæ przywróciæ oryginaln¹ intensywnoœæ, jeœli by³a > 0 i chcesz, aby stacja mia³a s³abe œwiat³o, gdy nie ³aduje
-            // stationLight.intensity = _originalLightIntensity;
-            // lub po prostu wyzerowaæ:
             stationLight.intensity = 0;
-            Debug.Log("Station light turned OFF.");
-        }
-        else
-        {
-            Debug.LogWarning("Attempted to turn off station light, but stationLight reference is null.");
         }
     }
 
-    // Optional: If you want to visualize the spawn point in the editor
     private void OnDrawGizmosSelected()
     {
         if (stationCubeSpawnPoint != null)

@@ -486,6 +486,13 @@ MonoBehaviour:
   playerCubeInHand: {fileID: 0}
   playerEnergy: {fileID: 0}
   stationLight: {fileID: 1457195300850855006}
+  notificationText: {fileID: 0}
+  notificationDisplayTime: 2.5
+  putInChargerMessage: Cube placed in charger
+  retrievedFromChargerMessage: Cube retrieved
+  energyFullMessage: Energy already full!
+  noCubeMessage: No cube in hand to place!
+  cubeFullyChargedMessage: Cube fully charged!
   cubePrefabOnStation: {fileID: 0}
   stationCubeSpawnPoint: {fileID: 0}
   interactAction: {fileID: -7898977888173200157, guid: 93dc519228223e44a9921074be139963, type: 3}
@@ -503,7 +510,7 @@ Light:
   serializedVersion: 11
   m_Type: 2
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_Intensity: 1
+  m_Intensity: 9
   m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -542,7 +549,7 @@ Light:
     serializedVersion: 2
     m_Bits: 4294967295
   m_RenderingLayerMask: 1
-  m_Lightmapping: 4
+  m_Lightmapping: 2
   m_LightShadowCasterMode: 0
   m_AreaSize: {x: 1, y: 1}
   m_BounceIntensity: 1

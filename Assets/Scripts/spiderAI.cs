@@ -206,4 +206,12 @@ public class spiderAI : MonoBehaviour
         Gizmos.color = Color.blue;
         Gizmos.DrawWireSphere(transform.position + eyeOffset, hearingRange);
     }
+    void OnTriggerEnter(Collider other)
+    {
+        if (currentState == State.Chase && other.transform == player) // Sprawdü, czy trigger jest z graczem i czy pajπk jest w stanie Chase
+        {
+            Debug.Log("Spider triggered with player!");
+            SceneManager.LoadScene(deathScene);
+        }
+    }
 }

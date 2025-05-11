@@ -979,7 +979,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 8, y: 3, z: 8}
+  m_Size: {x: 6.39, y: 3, z: 3.17}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!23 &520511262
 MeshRenderer:
@@ -1043,7 +1043,7 @@ Transform:
   m_GameObject: {fileID: 520511260}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -4.0033083, y: 1.11, z: -1.16}
+  m_LocalPosition: {x: -5.23, y: 1.11, z: -3.13}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3686,6 +3686,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1397483322}
     - target: {fileID: 1717615166276775235, guid: 4a6f19d41a728044ca40a92a4f067b1a, type: 3}
+      propertyPath: deathScene
+      value: deathScene
+      objectReference: {fileID: 0}
+    - target: {fileID: 1717615166276775235, guid: 4a6f19d41a728044ca40a92a4f067b1a, type: 3}
       propertyPath: 'patrolPoints.Array.data[0]'
       value: 
       objectReference: {fileID: 1456733636}
@@ -3703,7 +3707,7 @@ PrefabInstance:
       objectReference: {fileID: 1657756766}
     - target: {fileID: 2069645750967801451, guid: 4a6f19d41a728044ca40a92a4f067b1a, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -39.3
+      value: -15.63
       objectReference: {fileID: 0}
     - target: {fileID: 2069645750967801451, guid: 4a6f19d41a728044ca40a92a4f067b1a, type: 3}
       propertyPath: m_LocalPosition.y
@@ -3744,6 +3748,10 @@ PrefabInstance:
     - target: {fileID: 2083922199197034745, guid: 4a6f19d41a728044ca40a92a4f067b1a, type: 3}
       propertyPath: m_Name
       value: Spider
+      objectReference: {fileID: 0}
+    - target: {fileID: 4042586789304678300, guid: 4a6f19d41a728044ca40a92a4f067b1a, type: 3}
+      propertyPath: m_Intensity
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

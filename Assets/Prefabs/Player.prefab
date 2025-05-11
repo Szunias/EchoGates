@@ -422,6 +422,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Cube
       objectReference: {fileID: 0}
+    - target: {fileID: 2971801678953110040, guid: 8a94f7c47eac67a45899c535fd7a5023, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3442425139221689475, guid: 8a94f7c47eac67a45899c535fd7a5023, type: 3}
       propertyPath: m_Enabled
       value: 1
@@ -573,7 +577,7 @@ LineRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7083585161011524688}
-  m_Enabled: 0
+  m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1

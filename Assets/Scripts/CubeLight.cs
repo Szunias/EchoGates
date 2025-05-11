@@ -51,24 +51,41 @@ public class CubeLight : MonoBehaviour
 
     private void HandleLightInput()
     {
-        if (Input.GetMouseButton(1) && energy.HasEnergy(0.1f))
+        bool rightMouseDown = Input.GetMouseButton(1);
+        bool hasEnoughEnergy = energy.HasEnergy(0.1f);
+        // Debug.Log($"Right Mouse: {rightMouseDown}, Has Energy: {hasEnoughEnergy}, Current Energy: {energy.Percent}");
+
+        if (rightMouseDown && hasEnoughEnergy)
         {
             if (!pointLight.enabled)
+            {
                 pointLight.enabled = true;
+                Debug.Log("Point light ENABLED");
+            }
 
             energy.ConsumeEnergy(energyPerSecond * Time.deltaTime);
 
-            float energyFactor = (energy.Percent + 25) / energy.MaxEnergy; //the +25 is so that  the pointlight doesn't get too small when energy is low
+            float energyFactor = (energy.Percent + 25) / energy.MaxEnergy;
             pointLight.range = maxLightRange * energyFactor;
             pointLight.intensity = maxIntensity * energyFactor;
+            // Debug.Log($"EnergyFactor: {energyFactor}, Range: {pointLight.range}, Intensity: {pointLight.intensity}");
 
-            if (!energy.HasEnergy(0.1f))
-                pointLight.enabled = false;
+            if (!energy.HasEnergy(0.1f)) // Ponownie sprawdü po zuøyciu
+            {
+                if (pointLight.enabled) // Wy≥πcz tylko jeúli by≥o w≥πczone
+                {
+                    pointLight.enabled = false;
+                    Debug.Log("Point light DISABLED (energy depleted during use)");
+                }
+            }
         }
         else
         {
             if (pointLight.enabled)
+            {
                 pointLight.enabled = false;
+                Debug.Log("Point light DISABLED (mouse up or no initial energy)");
+            }
         }
     }
 

@@ -48,6 +48,7 @@ public class spiderAI : MonoBehaviour
     /* ---------- Grace period ---------- */
     private float graceEndTime;   // kiedy kończy się czas ochronny
     private bool graceDone = false;
+    public bool IsStunned => isStunned;
 
     /* ====================================================================== */
     /*                           LIFECYCLE                                    */

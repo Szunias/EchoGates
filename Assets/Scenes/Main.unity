@@ -5431,6 +5431,22 @@ PrefabInstance:
       propertyPath: energyPerSec
       value: 7
       objectReference: {fileID: 0}
+    - target: {fileID: 7688470443483906429, guid: 98db70db9a0b3b3459e4293c1a6e5e11, type: 3}
+      propertyPath: maxLightRange
+      value: 26
+      objectReference: {fileID: 0}
+    - target: {fileID: 7688470443483906429, guid: 98db70db9a0b3b3459e4293c1a6e5e11, type: 3}
+      propertyPath: emissionColor.b
+      value: 0.5568628
+      objectReference: {fileID: 0}
+    - target: {fileID: 7688470443483906429, guid: 98db70db9a0b3b3459e4293c1a6e5e11, type: 3}
+      propertyPath: emissionColor.g
+      value: 0.93333334
+      objectReference: {fileID: 0}
+    - target: {fileID: 7688470443483906429, guid: 98db70db9a0b3b3459e4293c1a6e5e11, type: 3}
+      propertyPath: emissionColor.r
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8615350157675523282, guid: 98db70db9a0b3b3459e4293c1a6e5e11, type: 3}
       propertyPath: m_Enabled
       value: 1

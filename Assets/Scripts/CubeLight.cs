@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-[RequireComponent(typeof(Light), typeof(LineRenderer))]
+[RequireComponent(typeof(Light), typeof(LineRenderer), typeof(Renderer))]
 public class CubeLight : MonoBehaviour
 {
     /* --------------------  INSPECTOR -------------------- */
@@ -29,10 +29,21 @@ public class CubeLight : MonoBehaviour
     [SerializeField] private float manualStunRadius = 7f;
     [SerializeField] private bool debugStunSphere = true;
 
+    [Header("Cube Emission")]
+    [SerializeField] private Color emissionColor = Color.cyan;
+    [SerializeField] private float emissionIntensity = 2f;
+
     /* --------------------  RUNTIME -------------------- */
     private Light pointLight;
     private LineRenderer beamLine;
     private float beamCooldown = 0f;
+
+    private Renderer cubeRenderer;
+    private Material runtimeMat;
+    private readonly int emissionID = Shader.PropertyToID("_EmissionColor");
+
+    /*  NEW: blokada gaśnięcia emisji w trakcie błysku LMB  */
+    private bool beamFlashActive = false;
 
     /* =================================================== */
     void Start()
@@ -49,12 +60,17 @@ public class CubeLight : MonoBehaviour
         beamLine.startWidth = 0.15f;
         beamLine.endWidth = 0.15f;
         beamLine.enabled = false;
+
+        cubeRenderer = GetComponent<Renderer>();
+        runtimeMat = cubeRenderer.material;            // unikatowa instancja
+        runtimeMat.EnableKeyword("_EMISSION");
+        SetEmission(false);
     }
 
     void Update()
     {
-        HandlePointLight(); // PPM
-        HandleBeam();       // LPM
+        HandlePointLight();  // PPM
+        HandleBeam();        // LMB
     }
 
     /* ==================  PPM  ================== */
@@ -69,21 +85,25 @@ public class CubeLight : MonoBehaviour
 
             energy.ConsumeEnergy(energyPerSec * Time.deltaTime);
 
-            /* Światło skaluje się z poziomem energii */
             float factor = (energy.Percent + 25f) / energy.MaxEnergy;
             pointLight.range = maxLightRange * factor;
             pointLight.intensity = maxIntensity * factor;
 
-            /* --- STUN W OBRĘBIE AKTYWNEGO PROMIENIA --- */
             float stunRadius = useManualStunRadius ? manualStunRadius : pointLight.range;
             StunSpidersInArea(stunRadius, 3f);
+
+            SetEmission(true);                     // świeć w trakcie PPM
 
             if (!energy.HasEnergy(0.1f))
                 pointLight.enabled = false;
         }
-        else if (pointLight.enabled)
+        else
         {
-            pointLight.enabled = false;
+            if (pointLight.enabled) pointLight.enabled = false;
+
+            /* --- gaś tylko, jeżeli NIE trwa błysk z LMB --- */
+            if (!beamFlashActive)
+                SetEmission(false);
         }
     }
 
@@ -113,11 +133,9 @@ public class CubeLight : MonoBehaviour
         {
             hitPoint = hit.point;
 
-            /* 5‑sekundowy stun, gdy trafimy pająka promieniem */
             if (hit.transform.TryGetComponent<spiderAI>(out var spider))
                 spider.Stun(5f);
 
-            /* np. zapalanie totemu */
             if (hit.transform.TryGetComponent<TotemLightingUp>(out var totem))
                 totem.LightUp();
         }
@@ -127,7 +145,9 @@ public class CubeLight : MonoBehaviour
         }
 
         beamLine.SetPosition(1, hitPoint);
-        StartCoroutine(ShootBeam());
+
+        StartCoroutine(FlashEmission());     // błysk sześcianu
+        StartCoroutine(ShootBeam());         // linia laseru
     }
 
     private IEnumerator ShootBeam()
@@ -137,7 +157,28 @@ public class CubeLight : MonoBehaviour
         beamLine.enabled = false;
     }
 
-    /* ==================  HELPERS  ================== */
+    /* ==================  EMISSION HELPERS  ================== */
+    private void SetEmission(bool on)
+    {
+        if (on)
+            runtimeMat.SetColor(emissionID, emissionColor * emissionIntensity);
+        else
+            runtimeMat.SetColor(emissionID, Color.black);
+    }
+
+    private IEnumerator FlashEmission()
+    {
+        beamFlashActive = true;      // blokujemy gaszenie
+        SetEmission(true);
+
+        yield return new WaitForSeconds(beamDuration);
+
+        beamFlashActive = false;
+        if (!Input.GetMouseButton(1))    // jeśli PPM nieprzytrzymany, gaś
+            SetEmission(false);
+    }
+
+    /* ==================  OTHER HELPERS  ================== */
     private void StunSpidersInArea(float radius, float duration)
     {
         Collider[] cols = Physics.OverlapSphere(beamOrigin.position, radius);
@@ -148,8 +189,8 @@ public class CubeLight : MonoBehaviour
         }
     }
 
-    /* ==================  DEBUG  ================== */
-    void OnDrawGizmosSelected()
+    /* ==================  DEBUG ================== */
+    private void OnDrawGizmosSelected()
     {
         if (!debugStunSphere) return;
 

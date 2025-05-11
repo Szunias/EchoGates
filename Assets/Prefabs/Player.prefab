@@ -15,7 +15,6 @@ GameObject:
   - component: {fileID: 5286752508549349766}
   - component: {fileID: 2271469307539103940}
   - component: {fileID: 5907756903357778770}
-  - component: {fileID: -8284611558556089666}
   m_Layer: 7
   m_Name: Player
   m_TagString: Player
@@ -225,26 +224,6 @@ MonoBehaviour:
   m_DefaultActionMap: Player
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 0}
---- !u!114 &-8284611558556089666
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3187143148051052950}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ab76ad038edf8f74995d51f0d749047a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  attackRange: 2
-  enemyMask:
-    serializedVersion: 2
-    m_Bits: 0
-  audioSource: {fileID: 0}
-  swingClip: {fileID: 0}
-  attackOrigin: {fileID: 0}
-  attackAction: {fileID: 0}
 --- !u!1 &7357977879049320586
 GameObject:
   m_ObjectHideFlags: 0
@@ -443,6 +422,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Cube
       objectReference: {fileID: 0}
+    - target: {fileID: 3442425139221689475, guid: 8a94f7c47eac67a45899c535fd7a5023, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5043914745287840676, guid: 8a94f7c47eac67a45899c535fd7a5023, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0.671
@@ -482,6 +465,10 @@ PrefabInstance:
     - target: {fileID: 5043914745287840676, guid: 8a94f7c47eac67a45899c535fd7a5023, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 26.507
+      objectReference: {fileID: 0}
+    - target: {fileID: 5342072111498205242, guid: 8a94f7c47eac67a45899c535fd7a5023, type: 3}
+      propertyPath: m_Enabled
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -586,7 +573,7 @@ LineRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7083585161011524688}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1

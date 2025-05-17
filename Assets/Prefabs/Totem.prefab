@@ -11,7 +11,8 @@ GameObject:
   - component: {fileID: 7682826223467252236}
   - component: {fileID: 1903454792276679842}
   - component: {fileID: 7972515351357597066}
-  - component: {fileID: 420989843078605724}
+  - component: {fileID: 2660699093831160586}
+  - component: {fileID: 2326714756640222668}
   m_Layer: 0
   m_Name: Level 2
   m_TagString: Untagged
@@ -65,7 +66,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 0}
+  - {fileID: 2100000, guid: 60f78579443ad12429042ee85b7944e4, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -87,7 +88,21 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &420989843078605724
+--- !u!114 &2660699093831160586
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1231576970188853291}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 37df78a71354da046ad5d6e0e0adc7d0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  lightUpMaterial: {fileID: 2100000, guid: 3e667e403408e5c4a99fe0e5189146a3, type: 2}
+  winSceneName: GameWon
+--- !u!65 &2326714756640222668
 BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -106,8 +121,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Size: {x: 1, y: 5.5, z: 1}
+  m_Center: {x: 0, y: 0.75, z: 0}
 --- !u!1 &7471656944767391099
 GameObject:
   m_ObjectHideFlags: 0
@@ -119,7 +134,8 @@ GameObject:
   - component: {fileID: 3207828934380911805}
   - component: {fileID: 7489222252382049662}
   - component: {fileID: 8241167953256711157}
-  - component: {fileID: 1998529651255973645}
+  - component: {fileID: 3914639680556721207}
+  - component: {fileID: 1051658834001675003}
   m_Layer: 0
   m_Name: Level 4
   m_TagString: Totem
@@ -173,7 +189,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 0}
+  - {fileID: 2100000, guid: 60f78579443ad12429042ee85b7944e4, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -195,7 +211,21 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &1998529651255973645
+--- !u!114 &3914639680556721207
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7471656944767391099}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 37df78a71354da046ad5d6e0e0adc7d0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  lightUpMaterial: {fileID: 2100000, guid: 3e667e403408e5c4a99fe0e5189146a3, type: 2}
+  winSceneName: GameWon
+--- !u!65 &1051658834001675003
 BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -214,8 +244,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Size: {x: 2, y: 5.5, z: 2}
+  m_Center: {x: 0, y: -2.25, z: 0}
 --- !u!1 &7806594555156322454
 GameObject:
   m_ObjectHideFlags: 0
@@ -227,7 +257,8 @@ GameObject:
   - component: {fileID: 4447348356481701988}
   - component: {fileID: 4345763734684433888}
   - component: {fileID: 9176484838967757472}
-  - component: {fileID: 5724045866180758931}
+  - component: {fileID: 6043041837967806102}
+  - component: {fileID: 286816682151091735}
   m_Layer: 0
   m_Name: Level 3
   m_TagString: Untagged
@@ -281,7 +312,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 0}
+  - {fileID: 2100000, guid: 60f78579443ad12429042ee85b7944e4, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -303,7 +334,21 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &5724045866180758931
+--- !u!114 &6043041837967806102
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7806594555156322454}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 37df78a71354da046ad5d6e0e0adc7d0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  lightUpMaterial: {fileID: 2100000, guid: 3e667e403408e5c4a99fe0e5189146a3, type: 2}
+  winSceneName: GameWon
+--- !u!65 &286816682151091735
 BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -322,8 +367,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Size: {x: 1, y: 5.5, z: 1}
+  m_Center: {x: 0, y: -0.75, z: 0}
 --- !u!1 &8787250617052221582
 GameObject:
   m_ObjectHideFlags: 0
@@ -333,7 +378,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 9124743664883186326}
-  - component: {fileID: 5110300870963030370}
   m_Layer: 0
   m_Name: Totem
   m_TagString: Totem
@@ -350,7 +394,7 @@ Transform:
   m_GameObject: {fileID: 8787250617052221582}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0.42, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -360,24 +404,6 @@ Transform:
   - {fileID: 3207828934380911805}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &5110300870963030370
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8787250617052221582}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 37df78a71354da046ad5d6e0e0adc7d0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  totemTime: 2
-  lightUpMaterial: {fileID: 2100000, guid: 3e667e403408e5c4a99fe0e5189146a3, type: 2}
-  level1: {fileID: 9159516245666834688}
-  level2: {fileID: 1231576970188853291}
-  level3: {fileID: 7806594555156322454}
-  level4: {fileID: 7471656944767391099}
 --- !u!1 &9159516245666834688
 GameObject:
   m_ObjectHideFlags: 0
@@ -389,7 +415,8 @@ GameObject:
   - component: {fileID: 1472211273625232972}
   - component: {fileID: 8669770340946488339}
   - component: {fileID: 3899856466882683330}
-  - component: {fileID: 2746137721986660561}
+  - component: {fileID: 8820790293251475388}
+  - component: {fileID: 2454573035091362741}
   m_Layer: 0
   m_Name: Level 1
   m_TagString: Untagged
@@ -443,7 +470,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 0}
+  - {fileID: 2100000, guid: 60f78579443ad12429042ee85b7944e4, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -465,7 +492,21 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &2746137721986660561
+--- !u!114 &8820790293251475388
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9159516245666834688}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 37df78a71354da046ad5d6e0e0adc7d0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  lightUpMaterial: {fileID: 2100000, guid: 3e667e403408e5c4a99fe0e5189146a3, type: 2}
+  winSceneName: GameWon
+--- !u!65 &2454573035091362741
 BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -484,5 +525,5 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Size: {x: 1, y: 5.5, z: 1}
+  m_Center: {x: 0, y: 2.2, z: 0}

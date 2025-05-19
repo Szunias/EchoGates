@@ -27,12 +27,13 @@ public class spiderAI : MonoBehaviour
     public float teleportMinDist = 4f;
     public float teleportMaxDist = 10f;
 
-    [Header("Startup")]                 // <‑‑‑ NOWE
+    [Header("Startup")]              // <‑‑‑ NOWE
     [Tooltip("Czas po starcie sceny, zanim pająk zacznie działać")]
     public float gracePeriod = 10f;
 
     [Header("References")] public Transform player;
     public string deathScene = "GameOver";
+    public Light spotLight; // <--- NOWE: Referencja do komponentu Spotlight
 
     /* ---------- STUN ---------- */
     private bool isStunned = false;
@@ -44,6 +45,7 @@ public class spiderAI : MonoBehaviour
     private float stateTimer;
     private float chaseTimer;
     private float teleportTimer;
+    private Color originalSpotlightColor; // <--- NOWE: Do przechowywania oryginalnego koloru światła
 
     /* ---------- Grace period ---------- */
     private float graceEndTime;   // kiedy kończy się czas ochronny
@@ -51,13 +53,14 @@ public class spiderAI : MonoBehaviour
     public bool IsStunned => isStunned;
 
     /* ====================================================================== */
-    /*                           LIFECYCLE                                    */
+    /* LIFECYCLE                                */
     /* ====================================================================== */
     void Awake()
     {
         if (agent == null) Debug.LogError("spiderAI: NavMeshAgent missing");
         if (player == null) Debug.LogError("spiderAI: Player reference missing");
         if (patrolPoints.Count == 0) Debug.LogError("spiderAI: patrolPoints empty");
+        if (spotLight == null) Debug.LogError("spiderAI: SpotLight reference missing. Przypisz Spotlight w Inspektorze."); // <--- NOWE: Sprawdzenie referencji
     }
 
     void Start()
@@ -68,6 +71,11 @@ public class spiderAI : MonoBehaviour
         graceEndTime = Time.time + gracePeriod;
         agent.isStopped = true;
 
+        if (spotLight != null) // <--- NOWE: Zapisz oryginalny kolor światła
+        {
+            originalSpotlightColor = spotLight.color;
+        }
+
         EnterIdle(); // nic nie robi, ale ustawia timery
     }
 
@@ -77,11 +85,11 @@ public class spiderAI : MonoBehaviour
         if (!graceDone)
         {
             if (Time.time < graceEndTime)
-                return;                    // przez pierwsze X sekund AI śpi
+                return;                  // przez pierwsze X sekund AI śpi
 
-            graceDone = true;          // koniec ochrony
+            graceDone = true;        // koniec ochrony
             agent.isStopped = false;
-            EnterIdle();                   // zresetuj timery i zacznij normalnie
+            EnterIdle();                  // zresetuj timery i zacznij normalnie
         }
 
         /* --------------- STUN HANDLING --------------- */
@@ -91,6 +99,10 @@ public class spiderAI : MonoBehaviour
             {
                 isStunned = false;
                 agent.isStopped = false;
+                if (spotLight != null) // <--- NOWE: Przywróć oryginalny kolor po zakończeniu ogłuszenia
+                {
+                    spotLight.color = originalSpotlightColor;
+                }
             }
             else
             {
@@ -114,7 +126,7 @@ public class spiderAI : MonoBehaviour
     }
 
     /* ====================================================================== */
-    /*                             STUN API                                   */
+    /* STUN API                                 */
     /* ====================================================================== */
     public void Stun(float duration)
     {
@@ -123,10 +135,15 @@ public class spiderAI : MonoBehaviour
         isStunned = true;
         stunEndTime = Mathf.Max(stunEndTime, Time.time + duration);
         agent.isStopped = true;
+
+        if (spotLight != null) // <--- NOWE: Zmień kolor na zielony podczas ogłuszenia
+        {
+            spotLight.color = Color.green;
+        }
     }
 
     /* ====================================================================== */
-    /*                     CAN DETECT PLAYER (bez zmian)                       */
+    /* CAN DETECT PLAYER (bez zmian)                    */
     /* ====================================================================== */
     bool CanDetectPlayer()
     {
@@ -154,7 +171,7 @@ public class spiderAI : MonoBehaviour
     }
 
     /* ====================================================================== */
-    /*                        IDLE / PATROL / CHASE ...                       */
+    /* IDLE / PATROL / CHASE ...                       */
     /* ====================================================================== */
     void EnterIdle()
     {
@@ -201,13 +218,17 @@ public class spiderAI : MonoBehaviour
     void UpdateChase()
     {
         chaseTimer += Time.deltaTime;
-        agent.SetDestination(player.position);
-
-        if (!agent.pathPending && agent.remainingDistance <= agent.stoppingDistance)
+        if (player != null) // Dodano sprawdzenie, czy player nie jest null
         {
-            SceneManager.LoadScene(deathScene);
-            return;
+            agent.SetDestination(player.position);
+
+            if (!agent.pathPending && agent.remainingDistance <= agent.stoppingDistance)
+            {
+                SceneManager.LoadScene(deathScene);
+                return;
+            }
         }
+
 
         if (!CanDetectPlayer())
         {
@@ -242,7 +263,7 @@ public class spiderAI : MonoBehaviour
     }
 
     /* ====================================================================== */
-    /*                            GIZMOS & TRIGGER                            */
+    /* GIZMOS & TRIGGER                           */
     /* ====================================================================== */
     void OnDrawGizmosSelected()
     {
@@ -254,7 +275,7 @@ public class spiderAI : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
-        if (currentState == State.Chase && other.transform == player)
+        if (player != null && currentState == State.Chase && other.transform == player) // Dodano sprawdzenie, czy player nie jest null
             SceneManager.LoadScene(deathScene);
     }
 }

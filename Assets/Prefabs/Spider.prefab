@@ -147,6 +147,7 @@ MonoBehaviour:
   gracePeriod: 10
   player: {fileID: 0}
   deathScene: 
+  spotLight: {fileID: 7050382542618386791}
 --- !u!195 &4753243531579135699
 NavMeshAgent:
   m_ObjectHideFlags: 0

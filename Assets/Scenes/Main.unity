@@ -3337,6 +3337,7 @@ MonoBehaviour:
   cameraMovement: {fileID: 3135356054504576700}
   playerInput: {fileID: 1397483338}
   enemy: {fileID: 0}
+  cubelight: {fileID: 1475682245}
 --- !u!4 &1160612099
 Transform:
   m_ObjectHideFlags: 0
@@ -4652,6 +4653,17 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 7083585161011524688, guid: 98db70db9a0b3b3459e4293c1a6e5e11, type: 3}
   m_PrefabInstance: {fileID: 3135356054504576697}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1475682245 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7688470443483906429, guid: 98db70db9a0b3b3459e4293c1a6e5e11, type: 3}
+  m_PrefabInstance: {fileID: 3135356054504576697}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1475682242}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ce7b341daaf22f24ca400d9993c79293, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!43 &1604183488
 Mesh:
   m_ObjectHideFlags: 0

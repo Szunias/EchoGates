@@ -3038,6 +3038,7 @@ MonoBehaviour:
   pickupKey: 101
   pickupPrompt: Press E to pick up
   existingCubeLight: {fileID: 95669869}
+  flickeringLight: {fileID: 1180160740}
 --- !u!65 &1291001316
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -3120,13 +3121,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1291001314}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 119.83768, y: 25.92, z: 48.49}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalRotation: {x: -0, y: -0.19826522, z: -0, w: 0.98014843}
+  m_LocalPosition: {x: 119.891, y: 25.566168, z: 48.68}
+  m_LocalScale: {x: 0.51386, y: 0.51386, z: 0.51386}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: -22.871, z: 0}
 --- !u!1001 &1313708505
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -12,7 +12,9 @@ public class CubePickup : MonoBehaviour
 
     private bool playerInRange = false;
     private GameObject player;
+    public FlickeringLight flickeringLight; // Drag in the Inspector
 
+  
     void Start()
     {
         // Znajdü gracza
@@ -29,6 +31,7 @@ public class CubePickup : MonoBehaviour
         {
             existingCubeLight.SetActive(false);
         }
+        
     }
 
     void Update()
@@ -62,6 +65,10 @@ public class CubePickup : MonoBehaviour
 
         // Zniszcz ten cube
         Destroy(gameObject);
+        if (flickeringLight != null)
+        {
+            flickeringLight.StartFlicker();
+        }
     }
 
     void OnGUI()

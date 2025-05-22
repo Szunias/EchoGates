@@ -48,8 +48,4 @@ public class FlickeringLight : MonoBehaviour
         isFlickering = false;
     }
 
-    void Start()
-    {
-        StartFlicker(); // Optional: remove if triggering from another script
-    }
 }

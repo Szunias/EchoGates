@@ -42,7 +42,7 @@ public class CubeLight : MonoBehaviour
     private Material runtimeMat;
     private readonly int emissionID = Shader.PropertyToID("_EmissionColor");
 
-    /*  NEW: blokada gaśnięcia emisji w trakcie błysku LMB  */
+    /*  NEW: blokada gaśnięcia emisji w trakcie błysku LMB  */
     private bool beamFlashActive = false;
 
     /* =================================================== */
@@ -92,7 +92,7 @@ public class CubeLight : MonoBehaviour
             float stunRadius = useManualStunRadius ? manualStunRadius : pointLight.range;
             StunSpidersInArea(stunRadius, 3f);
 
-            SetEmission(true);                     // świeć w trakcie PPM
+            SetEmission(true);                     // świeć w trakcie PPM
 
             if (!energy.HasEnergy(0.1f))
                 pointLight.enabled = false;
@@ -101,7 +101,7 @@ public class CubeLight : MonoBehaviour
         {
             if (pointLight.enabled) pointLight.enabled = false;
 
-            /* --- gaś tylko, jeżeli NIE trwa błysk z LMB --- */
+            /* --- gaś tylko, jeżeli NIE trwa błysk z LMB --- */
             if (!beamFlashActive)
                 SetEmission(false);
         }

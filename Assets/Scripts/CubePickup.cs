@@ -71,10 +71,7 @@ public class CubePickup : MonoBehaviour
 
         // Zniszcz ten cube
         Destroy(gameObject);
-        if (flickeringLight != null)
-        {
-            flickeringLight.StartFlicker();
-        }
+        
     }
 
     void OnGUI()

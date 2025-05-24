@@ -98,12 +98,5 @@ public class CubePickup : MonoBehaviour
         Gizmos.color = Color.green;
         Gizmos.DrawWireSphere(transform.position, pickupRange);
     }
-
-    public void CloseTutorial ()
-    {
-        FindFirstObjectByType<PlayerMovement>().Intutorial = false;
-        Cursor.visible = false;
-        Cursor.lockState = CursorLockMode.Confined;
-        Destroy(gameObject);
-    }
+    
 }

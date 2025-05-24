@@ -13,8 +13,9 @@ public class CubePickup : MonoBehaviour
     private bool playerInRange = false;
     private GameObject player;
     public FlickeringLight flickeringLight; // Drag in the Inspector
+    public GameObject myCanvas;
 
-  
+
     void Start()
     {
         // ZnajdŸ gracza
@@ -31,7 +32,8 @@ public class CubePickup : MonoBehaviour
         {
             existingCubeLight.SetActive(false);
         }
-        
+
+        //myCanvas.SetActive(false);
     }
 
     void Update()
@@ -47,6 +49,7 @@ public class CubePickup : MonoBehaviour
         if (playerInRange && Input.GetKeyDown(pickupKey))
         {
             PickUp();
+            myCanvas.SetActive(true);
         }
     }
 
@@ -56,6 +59,9 @@ public class CubePickup : MonoBehaviour
         if (existingCubeLight != null)
         {
             existingCubeLight.SetActive(true);
+            FindFirstObjectByType<PlayerMovement>().Intutorial = true;
+            Cursor.visible = true;
+            Cursor.lockState = CursorLockMode.None;
             Debug.Log("CubeLight activated!");
         }
         else
@@ -91,5 +97,13 @@ public class CubePickup : MonoBehaviour
         // Poka¿ zasiêg podnoszenia
         Gizmos.color = Color.green;
         Gizmos.DrawWireSphere(transform.position, pickupRange);
+    }
+
+    public void CloseTutorial ()
+    {
+        FindFirstObjectByType<PlayerMovement>().Intutorial = false;
+        Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Confined;
+        Destroy(gameObject);
     }
 }

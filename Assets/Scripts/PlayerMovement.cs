@@ -15,6 +15,8 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float gravity = -9.81f;
     private bool inInventory = false;
     private float verticalVelocity;
+    private bool inTutorial = false;
+    public bool Intutorial { set { inTutorial = value; } }
 
     private CharacterController characterController;
     private new Camera camera;
@@ -36,8 +38,10 @@ public class PlayerMovement : MonoBehaviour
 
     private void Update()
     {
-        if (!inInventory)
+
+        if (!inInventory && !inTutorial)
         {
+
             // --- Skok i grawitacja (tak jak było) ---
             if (characterController.isGrounded && verticalVelocity < 0f)
                 verticalVelocity = -2f;

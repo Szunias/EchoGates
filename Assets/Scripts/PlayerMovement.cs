@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using UnityEngine.InputSystem;
+// using UnityEngine.InputSystem; // This was in your script, but not used by the GetAxis calls. Remove if not using Input System package actions.
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -10,63 +10,114 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private GameObject inventoryObject;
     [SerializeField] private GameObject cameraObject;
 
-    // **DODANE**:
+    // Added by user:
     [SerializeField] private float jumpHeight = 1.5f;
     [SerializeField] private float gravity = -9.81f;
     private bool inInventory = false;
     private float verticalVelocity;
-    private bool inTutorial = false;
+    private bool inTutorial = false; // Backing field for Intutorial property
+
+    // Property as provided by user (lowercase 't')
     public bool Intutorial { set { inTutorial = value; } }
 
     private CharacterController characterController;
-    private new Camera camera;
+    private new Camera camera; // Using 'new' to hide any potential inherited member
 
     private void Start()
     {
         characterController = GetComponent<CharacterController>();
 
-        // Pobierz Stamina z tego obiektu, jeśli nie w Inspectorze
+        // Get Stamina component from this GameObject if not assigned in Inspector
         if (staminaSystem == null)
+        {
             staminaSystem = GetComponent<Stamina>();
+            if (staminaSystem == null)
+            {
+                Debug.LogError("PlayerMovement: Stamina system not found on the player or not assigned.", this.gameObject);
+            }
+        }
 
-        // Przypisz kamerę z pola lub domyślną
+        // Assign camera from the specified cameraObject or use the main camera as a fallback
         if (cameraObject != null)
+        {
             camera = cameraObject.GetComponent<Camera>();
+            if (camera == null)
+            {
+                Debug.LogError("PlayerMovement: Camera component not found on the assigned cameraObject. Falling back to Camera.main.", this.gameObject);
+                camera = Camera.main;
+            }
+        }
         else
+        {
             camera = Camera.main;
+        }
+
+        if (camera == null)
+        {
+            Debug.LogError("PlayerMovement: No camera found (neither assigned nor Camera.main). Movement might not work as expected.", this.gameObject);
+        }
     }
 
     private void Update()
     {
-
-        if (!inInventory && !inTutorial)
+        // Only allow movement if not in inventory and not in the tutorial state
+        if (!inInventory && !inTutorial) // Check the backing field directly for read access
         {
-
-            // --- Skok i grawitacja (tak jak było) ---
+            // --- Jump and gravity ---
             if (characterController.isGrounded && verticalVelocity < 0f)
-                verticalVelocity = -2f;
-            if (Input.GetButtonDown("Jump") && characterController.isGrounded)
-                verticalVelocity = Mathf.Sqrt(jumpHeight * -2f * gravity);
-            verticalVelocity += gravity * Time.deltaTime;
+            {
+                verticalVelocity = -2f; // Small downward force when grounded
+            }
 
-            // --- Ruch + sprint + stamina ---
-            Vector3 input = new Vector3(Input.GetAxis("Horizontal"), 0f, Input.GetAxis("Vertical"));
-            Vector3 forward = camera.transform.forward; forward.y = 0;
-            Vector3 right = camera.transform.right; right.y = 0;
+            if (Input.GetButtonDown("Jump") && characterController.isGrounded)
+            {
+                verticalVelocity = Mathf.Sqrt(jumpHeight * -2f * gravity);
+            }
+            verticalVelocity += gravity * Time.deltaTime; // Apply gravity
+
+            // --- Movement + sprint + stamina ---
+            float horizontalInput = Input.GetAxis("Horizontal");
+            float verticalInput = Input.GetAxis("Vertical");
+            Vector3 input = new Vector3(horizontalInput, 0f, verticalInput);
+
+            // Calculate movement direction relative to camera
+            Vector3 forward = Vector3.zero;
+            Vector3 right = Vector3.zero;
+
+            if (camera != null)
+            {
+                forward = camera.transform.forward;
+                right = camera.transform.right;
+            }
+            forward.y = 0; // Keep movement planar
+            right.y = 0;   // Keep movement planar
+            // Normalizing camera vectors can be good practice if camera has non-unit scale or unusual pitch.
+            // forward.Normalize();
+            // right.Normalize();
+
+            // Original direction calculation from your script
             Vector3 direction = forward * input.z + right * input.x;
 
-            bool isSprinting = Input.GetKey(KeyCode.LeftShift)
+            // Determine if sprinting
+            // Player must be trying to move for sprint speed to apply (input.sqrMagnitude check)
+            bool isActuallyMoving = input.sqrMagnitude > 0.01f;
+            bool canSprint = Input.GetKey(KeyCode.LeftShift)
                                 && staminaSystem != null
-                                && staminaSystem.HasStamina();
+                                && staminaSystem.HasStamina()
+                                && isActuallyMoving; // Only allow sprint if actually moving
 
-            float speed = isSprinting ? sprintSpeed : moveSpeed;
+            float speed = canSprint ? sprintSpeed : moveSpeed;
 
-            Vector3 move = direction * speed;
-            move.y = verticalVelocity;
+            // If not normalizing 'direction' before multiplying by speed, diagonal movement will be faster.
+            // To ensure consistent speed in all directions, normalize 'direction' if input is significant:
+            // if (isActuallyMoving) direction.Normalize();
+            Vector3 move = direction.normalized * speed; // Normalized direction for consistent speed
+            if (!isActuallyMoving) move = Vector3.zero; // Ensure no movement if no input, even if direction was calculated from tiny joystick drift
+
+            move.y = verticalVelocity; // Add vertical movement (jump/gravity)
+
             characterController.Move(move * Time.deltaTime);
             // --------------------------------------------
         }
-
-        // ... reszta Twojego kodu (inwentaryzacja, interakcje) bez zmian ...
     }
 }

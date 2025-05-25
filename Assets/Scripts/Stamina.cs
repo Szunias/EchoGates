@@ -15,7 +15,7 @@ public class Stamina : MonoBehaviour
 
     void Awake()
     {
-        // initialize
+        // Initialize
         currentStamina = maxStamina;
 
         if (staminaSlider != null)
@@ -31,22 +31,37 @@ public class Stamina : MonoBehaviour
 
     void Update()
     {
-        // drain while holding Shift and having stamina
-        bool isSprinting = Input.GetKey(KeyCode.LeftShift) && currentStamina > 0f;
-        if (isSprinting)
+        // Check for movement input from the player
+        // Using a small threshold to account for analog stick dead zones or minor floating point inaccuracies
+        bool isTryingToMove = Mathf.Abs(Input.GetAxis("Horizontal")) > 0.01f || Mathf.Abs(Input.GetAxis("Vertical")) > 0.01f;
+        bool wantsToSprint = Input.GetKey(KeyCode.LeftShift);
+
+        if (wantsToSprint && isTryingToMove) // Player is attempting to sprint (holding key AND moving)
         {
-            currentStamina -= drainRate * Time.deltaTime;
-            currentStamina = Mathf.Max(currentStamina, 0f);
+            if (currentStamina > 0f)
+            {
+                // Drain stamina if the player wants to sprint, is trying to move, and has stamina
+                currentStamina -= drainRate * Time.deltaTime;
+                currentStamina = Mathf.Max(currentStamina, 0f); // Clamp stamina at 0
+            }
+            // If currentStamina is 0f here, and player is still trying to sprint/move,
+            // stamina will NOT regenerate in this block. It will remain 0.
         }
-        else
+        else // Player is NOT attempting to sprint (either not holding sprint key OR not moving OR out of stamina and still trying)
         {
-            currentStamina += regenRate * Time.deltaTime;
-            currentStamina = Mathf.Min(currentStamina, maxStamina);
+            // Regenerate stamina if it's not already full
+            if (currentStamina < maxStamina)
+            {
+                currentStamina += regenRate * Time.deltaTime;
+                currentStamina = Mathf.Min(currentStamina, maxStamina); // Clamp stamina at maxStamina
+            }
         }
 
-        // update UI
+        // Update UI
         if (staminaSlider != null)
+        {
             staminaSlider.value = currentStamina;
+        }
     }
 
     /// <summary>
@@ -54,6 +69,7 @@ public class Stamina : MonoBehaviour
     /// </summary>
     public bool HasStamina()
     {
+        // This will correctly return false if currentStamina is 0
         return currentStamina > 0f;
     }
 

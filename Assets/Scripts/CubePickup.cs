@@ -33,7 +33,7 @@ public class CubePickup : MonoBehaviour
             existingCubeLight.SetActive(false);
         }
 
-        //myCanvas.SetActive(false);
+        
     }
 
     void Update()

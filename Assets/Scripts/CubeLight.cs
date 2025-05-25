@@ -48,8 +48,9 @@ public class CubeLight : MonoBehaviour
     /* =================================================== */
     void Start()
     {
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
+        // Usunięte lub zakomentowane linie:
+        // Cursor.lockState = CursorLockMode.Locked;
+        // Cursor.visible = false;
 
         pointLight = GetComponent<Light>();
         pointLight.type = LightType.Point;
@@ -62,7 +63,7 @@ public class CubeLight : MonoBehaviour
         beamLine.enabled = false;
 
         cubeRenderer = GetComponent<Renderer>();
-        runtimeMat = cubeRenderer.material;            // unikatowa instancja
+        runtimeMat = cubeRenderer.material;
         runtimeMat.EnableKeyword("_EMISSION");
         SetEmission(false);
     }

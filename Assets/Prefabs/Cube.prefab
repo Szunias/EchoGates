@@ -16,7 +16,6 @@ GameObject:
   - component: {fileID: 5501388007211099446}
   - component: {fileID: 3651701892484107988}
   - component: {fileID: 407757348821938291}
-  - component: {fileID: 2521556007390061297}
   m_Layer: 7
   m_Name: Cube
   m_TagString: Player
@@ -299,7 +298,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerCamera: {fileID: 0}
   beamOrigin: {fileID: 5043914745287840676}
-  energy: {fileID: 2521556007390061297}
+  energy: {fileID: 0}
   maxLightRange: 15
   maxIntensity: 100
   energyPerSec: 2
@@ -336,18 +335,3 @@ MonoBehaviour:
   m_LightCookieSize: {x: 1, y: 1}
   m_LightCookieOffset: {x: 0, y: 0}
   m_SoftShadowQuality: 0
---- !u!114 &2521556007390061297
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2971801678953110040}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 470a09236e05c954eb8ffa53262435a3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Percent: 100
-  MaxEnergy: 100
-  energyBar: {fileID: 0}

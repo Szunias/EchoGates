@@ -5,13 +5,27 @@ public class TotemLightingUp : MonoBehaviour
 {
     [Header("Totem Settings")]
     [SerializeField] private Material lightUpMaterial;
-    [SerializeField] private string winSceneName = "GameWon";
 
+    public static bool cageIsGone = false;
     private bool isLit = false;
+
+    [Header("Cage Settings")]
+    [SerializeField] private GameObject cage; 
 
     // Statyczny licznik dla wszystkich totemów
     private static int litTotems = 0;
     private const int REQUIRED_TOTEMS = 5;
+
+    private static GameObject sharedCage;
+
+    private void Start()
+    {
+        // Only set sharedCage once, from the first Totem with a valid reference
+        if (sharedCage == null && cage != null)
+        {
+            sharedCage = cage;
+        }
+    }
 
     // Metoda do zapalenia totemu
     public void LightUp()
@@ -43,8 +57,13 @@ public class TotemLightingUp : MonoBehaviour
         // Sprawdź, czy wszystkie totemy są zapalone
         if (litTotems >= REQUIRED_TOTEMS)
         {
-            Debug.Log("Wszystkie totemy zapalone! Wczytywanie sceny: " + winSceneName);
-            SceneManager.LoadScene(winSceneName);
+
+            if (sharedCage != null)
+            {
+                Destroy(sharedCage); // Completely removes the cage from the scene
+                Debug.Log("Cage destroyed!");
+            }
+            cageIsGone = true;
         }
     }
 

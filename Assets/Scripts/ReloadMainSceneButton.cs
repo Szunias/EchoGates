@@ -3,34 +3,33 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
 /// <summary>
-/// Podłącz do obiektu przycisku.  <br/>
-/// 1.  Gdy menu się aktywuje, pokazuje kursor. <br/>
-/// 2.  Po kliknięciu ładuje wskazaną scenę, ponownie chowa i blokuje kursor
-///     (CubeLight i tak zrobi to w Start, ale tu masz pewność nawet
-///      gdyby scenę wczytywał kto inny).
+/// Attach to a Button GameObject. <br/>
+/// 1. When the menu (or button) activates, it shows the cursor. <br/>
+/// 2. When clicked, it loads the specified scene and hides/locks the cursor again.
 /// </summary>
 [RequireComponent(typeof(Button))]
 public class ReloadMainSceneButton : MonoBehaviour
 {
-    [Tooltip("Scena do ponownego wczytania")]
-    [SerializeField] private string sceneName = "MainScene";
+    [Tooltip("The scene to reload (e.g., your main game scene)")]
+    [SerializeField] private string sceneName = "MainScene"; // Make sure this matches your scene name
 
     private Button _btn;
 
-    /* --------------------  UI lifecycle  -------------------- */
-    private void OnEnable()          // gdy menu / przycisk staje się widoczny
+    /* --------------------  UI Lifecycle  -------------------- */
+    private void OnEnable()         // When the menu / button becomes visible
     {
-        // Pokaż kursor, odblokuj kamerę
+        // Show cursor, unlock camera (or allow interaction)
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
 
-        // Zarejestruj klik
+        // Register the click listener
         _btn = GetComponent<Button>();
         _btn.onClick.AddListener(ReloadScene);
     }
 
-    private void OnDisable()         // porządek przy chowaniu menu
+    private void OnDisable()        // Cleanup when hiding the menu
     {
+        // Unregister the click listener to prevent potential issues
         if (_btn != null)
             _btn.onClick.RemoveListener(ReloadScene);
     }
@@ -38,10 +37,17 @@ public class ReloadMainSceneButton : MonoBehaviour
     /* --------------------  ACTION  -------------------- */
     private void ReloadScene()
     {
-        // Schowaj kursor natychmiast (opcjonalne, dodatkowe zabezpieczenie)
+        // --- RESET TOTEM PROGRESS ---
+        // This is the crucial line: Call the static reset method before loading.
+        TotemLightingUp.ResetTotemProgress();
+        Debug.Log("Totem progress reset initiated before scene reload.");
+        // -----------------------------
+
+        // Hide cursor immediately (optional, as a safeguard)
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
 
+        // Reload the scene
         SceneManager.LoadScene(sceneName);
     }
 }

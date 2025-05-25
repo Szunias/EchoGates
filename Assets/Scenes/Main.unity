@@ -6384,6 +6384,10 @@ PrefabInstance:
       propertyPath: cage
       value: 
       objectReference: {fileID: 1759579153}
+    - target: {fileID: 2921584557606161394, guid: 9eb3d2def4d541f43a6a2fd26810efe6, type: 3}
+      propertyPath: cageObject
+      value: 
+      objectReference: {fileID: 1759579153}
     - target: {fileID: 2991520010603382461, guid: 9eb3d2def4d541f43a6a2fd26810efe6, type: 3}
       propertyPath: m_Mesh
       value: 
@@ -6402,6 +6406,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3156089465290904296, guid: 9eb3d2def4d541f43a6a2fd26810efe6, type: 3}
       propertyPath: cage
+      value: 
+      objectReference: {fileID: 1759579153}
+    - target: {fileID: 3156089465290904296, guid: 9eb3d2def4d541f43a6a2fd26810efe6, type: 3}
+      propertyPath: cageObject
       value: 
       objectReference: {fileID: 1759579153}
     - target: {fileID: 3622901434007215113, guid: 9eb3d2def4d541f43a6a2fd26810efe6, type: 3}
@@ -6476,8 +6484,16 @@ PrefabInstance:
       propertyPath: cage
       value: 
       objectReference: {fileID: 1759579153}
+    - target: {fileID: 4820591841750024593, guid: 9eb3d2def4d541f43a6a2fd26810efe6, type: 3}
+      propertyPath: cageObject
+      value: 
+      objectReference: {fileID: 1759579153}
     - target: {fileID: 4958526851458442570, guid: 9eb3d2def4d541f43a6a2fd26810efe6, type: 3}
       propertyPath: cage
+      value: 
+      objectReference: {fileID: 1759579153}
+    - target: {fileID: 4958526851458442570, guid: 9eb3d2def4d541f43a6a2fd26810efe6, type: 3}
+      propertyPath: cageObject
       value: 
       objectReference: {fileID: 1759579153}
     - target: {fileID: 5328570147155740915, guid: 9eb3d2def4d541f43a6a2fd26810efe6, type: 3}
@@ -6526,6 +6542,10 @@ PrefabInstance:
       objectReference: {fileID: 1271405476}
     - target: {fileID: 5792495371666239153, guid: 9eb3d2def4d541f43a6a2fd26810efe6, type: 3}
       propertyPath: cage
+      value: 
+      objectReference: {fileID: 1759579153}
+    - target: {fileID: 5792495371666239153, guid: 9eb3d2def4d541f43a6a2fd26810efe6, type: 3}
+      propertyPath: cageObject
       value: 
       objectReference: {fileID: 1759579153}
     - target: {fileID: 5792495371666239153, guid: 9eb3d2def4d541f43a6a2fd26810efe6, type: 3}

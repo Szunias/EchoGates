@@ -15,51 +15,59 @@ public class CubePickup : MonoBehaviour
     public FlickeringLight flickeringLight; // Drag in the Inspector
     public GameObject myCanvas;
 
+    // --- NOWA ZMIENNA STATYCZNA ---
+    public static bool hasCube = false;
+    // -----------------------------
 
     void Start()
     {
-        // ZnajdŸ gracza
+        // Resetuj stan przy starcie sceny (jeœli to konieczne, np. przy ponownym ³adowaniu poziomu)
+        // Jeœli chcesz, aby stan by³ zachowany miêdzy scenami, musia³byœ u¿yæ np. DontDestroyOnLoad dla obiektu zarz¹dzaj¹cego stanem gry.
+        // Dla prostoty tego przyk³adu, resetujemy go tutaj.
+        // Jeœli masz mened¿era gry, lepiej zarz¹dzaæ tym stanem tam.
+        hasCube = false; // Upewnij siê, ¿e na starcie gracz nie ma kostki
+
         player = GameObject.FindGameObjectWithTag("Player");
 
-        // Jeœli nie przypisano rêcznie, spróbuj znaleŸæ
         if (existingCubeLight == null)
         {
-            existingCubeLight = GameObject.Find("CubeLight"); // Lub inna nazwa
+            existingCubeLight = GameObject.Find("CubeLight");
         }
 
-        // Upewnij siê ¿e CubeLight jest wy³¹czony na start
         if (existingCubeLight != null)
         {
             existingCubeLight.SetActive(false);
         }
-
-        
     }
 
     void Update()
     {
-        // SprawdŸ odleg³oœæ do gracza
         if (player != null)
         {
             float distance = Vector3.Distance(transform.position, player.transform.position);
             playerInRange = distance <= pickupRange;
         }
 
-        // Obs³uga podnoszenia
         if (playerInRange && Input.GetKeyDown(pickupKey))
         {
             PickUp();
-            myCanvas.SetActive(true);
+            if (myCanvas != null) // Dodano sprawdzenie czy myCanvas jest przypisany
+            {
+                myCanvas.SetActive(true);
+            }
         }
     }
 
     private void PickUp()
     {
-        // Aktywuj istniej¹cy CubeLight
         if (existingCubeLight != null)
         {
             existingCubeLight.SetActive(true);
-            FindFirstObjectByType<PlayerMovement>().Intutorial = true;
+            PlayerMovement playerMovement = FindFirstObjectByType<PlayerMovement>();
+            if (playerMovement != null) // Dodano sprawdzenie
+            {
+                playerMovement.Intutorial = true;
+            }
             Cursor.visible = true;
             Cursor.lockState = CursorLockMode.None;
             Debug.Log("CubeLight activated!");
@@ -69,16 +77,18 @@ public class CubePickup : MonoBehaviour
             Debug.LogError("CubeLight reference not set!");
         }
 
-        // Zniszcz ten cube
+        // --- USTAW FLAGÊ ---
+        hasCube = true;
+        Debug.Log("Cube has been picked up! Teleport is now potentially active.");
+        // -------------------
+
         Destroy(gameObject);
-        
     }
 
     void OnGUI()
     {
         if (playerInRange)
         {
-            // Poka¿ prompt
             GUI.Label(new Rect(Screen.width / 2 - 100, Screen.height / 2 + 50, 200, 30),
                       pickupPrompt, new GUIStyle()
                       {
@@ -91,9 +101,7 @@ public class CubePickup : MonoBehaviour
 
     void OnDrawGizmosSelected()
     {
-        // Poka¿ zasiêg podnoszenia
         Gizmos.color = Color.green;
         Gizmos.DrawWireSphere(transform.position, pickupRange);
     }
-    
 }

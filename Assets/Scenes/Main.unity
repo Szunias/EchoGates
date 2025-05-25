@@ -3974,7 +3974,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   winSceneName: GameWon
   interactionKey: 101
-  interactionPromptMessage: Press E to Interact with Dog
+  interactionPromptMessage: Press E to get your puppy back
   beamObject: {fileID: 1818142664}
   promptText: {fileID: 35724613}
 --- !u!4 &997089966 stripped

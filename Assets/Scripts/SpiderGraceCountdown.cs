@@ -2,11 +2,11 @@
 using TMPro;
 using UnityEngine.UI;
 
-/// <summary>Wyświetla odliczanie (mm:ss) do końca grace‑period pająka.</summary>
+/// <summary>Wyświetla odliczanie (mm:ss) do końca grace-period pająka.</summary>
 public class SpiderGraceCountdown : MonoBehaviour
 {
     [Header("References")]
-    [Tooltip("Pająk z gracePeriod. Puste = pierwszy spiderAI w scenie.")]
+    [Tooltip("Pająk z gracePeriod. Puste = pierwszy spiderAI w scenie.")]
     [SerializeField] private spiderAI spider;
 
     [Tooltip("Pole TextMeshProUGUI lub UI.Text. Puste = komponent na tym obiekcie.")]
@@ -16,26 +16,26 @@ public class SpiderGraceCountdown : MonoBehaviour
     private float startTime;
     private bool running = false;
 
-    /* ─────────────────────────────────────────────── */
     void OnEnable()
     {
-        // zawsze wyczyść tekst startowy (np. “Countdown” wpisany w Inspectorze)
+        // zawsze wyczyść tekst startowy (np. “Countdown” wpisany w Inspectorze)
         ResetText();
     }
 
     void Awake()
     {
-        /* ---- znajdź pająka ---- */
+        // ---- znajdź pająka ----
         if (spider == null)
-            spider = FindObjectOfType<spiderAI>();
+            spider = Object.FindAnyObjectByType<spiderAI>();
 
         if (spider == null)
         {
             Debug.LogWarning($"{name}/{GetType().Name}: nie znaleziono spiderAI.");
-            return;           // nie wyłączamy – dalej możemy pokazać pusty napis
+            // możemy kontynuować, ale licznik będzie pusty
+            return;
         }
 
-        /* ---- znajdź pole tekstowe ---- */
+        // ---- znajdź pole tekstowe ----
         if (textField == null)
             textField = GetComponent<TMP_Text>() ?? (Component)GetComponent<Text>();
 
@@ -50,13 +50,11 @@ public class SpiderGraceCountdown : MonoBehaviour
         running = true;
     }
 
-    /* ─────────────────────────────────────────────── */
     void Update()
     {
         if (!running) return;
 
         float remaining = Mathf.Max(0f, graceDuration - (Time.time - startTime));
-
         int totalSec = Mathf.CeilToInt(remaining);
         int minutes = totalSec / 60;
         int seconds = totalSec % 60;
@@ -71,7 +69,6 @@ public class SpiderGraceCountdown : MonoBehaviour
         }
     }
 
-    /* ─────────────────────────────────────────────── */
     private void WriteText(string msg)
     {
         if (textField is TMP_Text tmp)

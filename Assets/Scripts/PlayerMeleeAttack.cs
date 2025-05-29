@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using UnityEngine.InputSystem;   // ✨ New Input System
+using UnityEngine.InputSystem;   // ✨ New Input System
 
 public class PlayerMeleeAttack : MonoBehaviour
 {
@@ -16,11 +16,10 @@ public class PlayerMeleeAttack : MonoBehaviour
 
     [Header("Input")]
     [Tooltip("Drag your “Attack” InputActionReference here")]
-    [SerializeField] private InputActionReference attackAction;   // <-- reference to the action
+    [SerializeField] private InputActionReference attackAction;
 
     private void OnEnable()
     {
-        // make sure the action is enabled when this component is active
         if (attackAction) attackAction.action.Enable();
     }
 
@@ -31,32 +30,33 @@ public class PlayerMeleeAttack : MonoBehaviour
 
     private void Start()
     {
-        // fallback ‑ if no attackOrigin was set in the Inspector, grab the main camera
-        if (!attackOrigin)
+        // fallback – jeśli nie ustawiono w Inspectorze, weź pierwszą kamerę w scenie
+        if (attackOrigin == null)
         {
-            Camera cam = Camera.main ? Camera.main : FindObjectOfType<Camera>();
-            if (cam) attackOrigin = cam.transform;
-            else Debug.LogError("PlayerMeleeAttack: No camera found. Assign Attack Origin in the Inspector.");
+            Camera cam = Camera.main;
+            if (cam == null)
+                cam = Object.FindAnyObjectByType<Camera>();
+            if (cam != null)
+                attackOrigin = cam.transform;
+            else
+                Debug.LogError("PlayerMeleeAttack: No camera found. Assign Attack Origin in the Inspector.");
         }
     }
 
     private void Update()
     {
-        // InputSystem polling: true in the frame the button/trigger was pressed
-        if (attackAction && attackAction.action.WasPressedThisFrame())
+        if (attackAction?.action.WasPressedThisFrame() == true)
             AttemptAttack();
     }
 
     private void AttemptAttack()
     {
-        // play swing immediately—even if we miss
         if (audioSource && swingClip)
             audioSource.PlayOneShot(swingClip);
 
-        if (!attackOrigin) return;
+        if (attackOrigin == null) return;
 
         Ray ray = new Ray(attackOrigin.position, attackOrigin.forward);
-
         if (Physics.Raycast(ray, out RaycastHit hit, attackRange, enemyMask))
         {
             var enemy = hit.collider.GetComponentInParent<EnemyHealth>();

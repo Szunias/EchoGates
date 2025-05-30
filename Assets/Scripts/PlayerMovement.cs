@@ -1,5 +1,7 @@
-﻿using UnityEngine;
+﻿using System.Runtime.CompilerServices;
+using UnityEngine;
 // using UnityEngine.InputSystem; // This was in your script, but not used by the GetAxis calls. Remove if not using Input System package actions.
+
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -22,6 +24,14 @@ public class PlayerMovement : MonoBehaviour
 
     private CharacterController characterController;
     private new Camera camera; // Using 'new' to hide any potential inherited member
+
+    // Audio
+    private AudioSource source;
+    private Vector3 previousPosition;   
+    private float totalDistance = 0;
+    [Tooltip("Sound effects for wood")][SerializeField] private GameObject woodSteps;
+    [Tooltip("Sound effects for grass")][SerializeField] private GameObject grassSteps;
+    [Tooltip("Sound effects for carpet")][SerializeField] private GameObject carpetSteps;
 
     private void Start()
     {
@@ -60,6 +70,46 @@ public class PlayerMovement : MonoBehaviour
 
     private void Update()
     {
+        Vector3 currentPosition = transform.localPosition;
+        float distance = Mathf.Abs(Vector3.Magnitude(currentPosition - previousPosition));
+        totalDistance = totalDistance + distance;
+        Debug.Log(totalDistance);
+
+        // Audio
+        if (totalDistance >= 8.4f)
+        {
+            Vector3 rayOrigin = transform.position;
+            RaycastHit hit;
+            if (Physics.Raycast(rayOrigin, Vector3.down, out hit, 6f))
+            {
+                if (LayerMask.LayerToName(hit.collider.gameObject.layer) == "Wood")
+                {
+                    GameObject woodenFootsteps = Instantiate(woodSteps);
+                    woodenFootsteps.transform.position = transform.position;
+                    totalDistance = 0;
+                }
+                else if (LayerMask.LayerToName(hit.collider.gameObject.layer) == "Ground")
+                {
+                    GameObject grassFootsteps = Instantiate(grassSteps);
+                    grassFootsteps.transform.position = transform.position;
+                    totalDistance = 0;
+                }
+                else if (LayerMask.LayerToName(hit.collider.gameObject.layer) == "Carpet")
+                {
+                    GameObject carpetFootsteps = Instantiate(carpetSteps);
+                    carpetFootsteps.transform.position = transform.position;
+                    totalDistance = 0;
+                }
+                else //failsafe
+                {
+                    GameObject grassFootsteps = Instantiate(grassSteps);
+                    grassFootsteps.transform.position = transform.position;
+                    totalDistance = 0;
+                }
+            }
+        }
+        previousPosition = currentPosition;
+
         // Only allow movement if not in inventory and not in the tutorial state
         if (!inInventory && !inTutorial) // Check the backing field directly for read access
         {

@@ -1,4 +1,5 @@
 ﻿using System.Runtime.CompilerServices;
+using UnityEditor.VersionControl;
 using UnityEngine;
 // using UnityEngine.InputSystem; // This was in your script, but not used by the GetAxis calls. Remove if not using Input System package actions.
 
@@ -66,14 +67,17 @@ public class PlayerMovement : MonoBehaviour
         {
             Debug.LogError("PlayerMovement: No camera found (neither assigned nor Camera.main). Movement might not work as expected.", this.gameObject);
         }
+
+        source = GetComponent<AudioSource>();
     }
 
     private void Update()
     {
         Vector3 currentPosition = transform.localPosition;
         float distance = Mathf.Abs(Vector3.Magnitude(currentPosition - previousPosition));
+        float pitch = GetPitchFromDistance(distance);
+        source.pitch = pitch;
         totalDistance = totalDistance + distance;
-        Debug.Log(totalDistance);
 
         // Audio
         if (totalDistance >= 8.4f)
@@ -169,5 +173,10 @@ public class PlayerMovement : MonoBehaviour
             characterController.Move(move * Time.deltaTime);
             // --------------------------------------------
         }
+    }
+
+    private float GetPitchFromDistance(float distance)
+    {
+        return Mathf.Clamp(1f + (distance / 5f), 0.5f, 2f);
     }
 }

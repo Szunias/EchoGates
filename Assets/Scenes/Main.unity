@@ -23327,8 +23327,12 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2744123652101309066, guid: 98db70db9a0b3b3459e4293c1a6e5e11, type: 3}
+      propertyPath: m_Volume
+      value: 0.558
+      objectReference: {fileID: 0}
+    - target: {fileID: 2744123652101309066, guid: 98db70db9a0b3b3459e4293c1a6e5e11, type: 3}
       propertyPath: m_PlayOnAwake
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2744123652101309066, guid: 98db70db9a0b3b3459e4293c1a6e5e11, type: 3}
       propertyPath: OutputAudioMixerGroup

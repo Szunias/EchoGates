@@ -139,6 +139,11 @@ public class CubeLight : MonoBehaviour
 
             if (hit.transform.TryGetComponent<TotemLightingUp>(out var totem))
                 totem.LightUp();
+            if (hit.transform.TryGetComponent<TutorialTotem>(out var tutorialTotem))
+            {
+                tutorialTotem.LightUp();
+            } 
+
         }
         else
         {

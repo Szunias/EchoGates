@@ -8,6 +8,7 @@ TagManager:
   - EnemyProjectile
   - Chargeable
   - Totem
+  - TotemTutorial
   layers:
   - Default
   - TransparentFX

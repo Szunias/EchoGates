@@ -28,6 +28,11 @@ public class ChargingStation : MonoBehaviour
     [SerializeField] private string noCubeMessage = "No cube in hand to place!";
     [Tooltip("Text displayed when Cube fully charged")]
     [SerializeField] private string cubeFullyChargedMessage = "Cube fully charged!";
+    [SerializeField] private string interactionPromptMessage = "Press E to Interact with Dog";
+
+    [Header("UI References")]
+    [Tooltip("The TextMeshProUGUI element to display the interaction prompt.")]
+    [SerializeField] private TextMeshProUGUI promptText; // Assign your prompt TextMeshProUGUI element here
 
 
     [Header("Prefabs & Points")]
@@ -58,6 +63,7 @@ public class ChargingStation : MonoBehaviour
     private bool _isCharging = false;
     private bool _playerInRange = false;
     private float _originalLightIntensity;
+    private bool isPlayerInRange = false;
 
     private bool firstChargeDone = false;
 
@@ -76,6 +82,14 @@ public class ChargingStation : MonoBehaviour
             Debug.LogError("Interact Action not assigned on ChargingStation: " + gameObject.name, this);
         else
             Debug.Log("Interact Action is assigned.");
+        if (promptText != null)
+        {
+            promptText.gameObject.SetActive(false);
+        }
+        else
+        {
+            Debug.LogWarning("DogInteraction: PromptText is not assigned. UI prompt will not be displayed.", this.gameObject);
+        }
 
         // Walidacja TextMeshProUGUI
         if (notificationText == null)
@@ -163,6 +177,22 @@ public class ChargingStation : MonoBehaviour
             {
                 _playerInRange = false;
                 Debug.Log("Player CONFIRMED exited range of Charging Station.");
+            }
+            if (promptText != null && promptText.gameObject.activeSelf)
+            {
+                promptText.gameObject.SetActive(false); // Hide prompt when player exits
+            }
+        }
+    }
+
+    private void Update()
+    {
+        if (_playerInRange)
+        {
+            if (promptText != null && !promptText.gameObject.activeSelf)
+            {
+                promptText.text = interactionPromptMessage;
+                promptText.gameObject.SetActive(true);
             }
         }
     }

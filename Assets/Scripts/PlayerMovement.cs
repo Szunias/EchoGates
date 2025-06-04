@@ -1,5 +1,5 @@
 ﻿using System.Runtime.CompilerServices;
-using UnityEditor.VersionControl;
+
 using UnityEngine;
 // using UnityEngine.InputSystem; // This was in your script, but not used by the GetAxis calls. Remove if not using Input System package actions.
 
@@ -24,7 +24,7 @@ public class PlayerMovement : MonoBehaviour
     public bool Intutorial { set { inTutorial = value; } }
 
     private CharacterController characterController;
-    private new Camera camera; // Using 'new' to hide any potential inherited member
+    private Camera camera; // Using 'new' to hide any potential inherited member
 
     // Audio
     private AudioSource source;

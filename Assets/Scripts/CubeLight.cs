@@ -52,6 +52,9 @@ public class CubeLight : MonoBehaviour
 
     private bool rightClickTriggered = false;
 
+    private AudioSource audioSource;
+    [SerializeField] private AudioClip clip;
+
     /* =================================================== */
     void Start()
     {
@@ -73,6 +76,8 @@ public class CubeLight : MonoBehaviour
         runtimeMat = cubeRenderer.material;
         runtimeMat.EnableKeyword("_EMISSION");
         SetEmission(false);
+
+        audioSource = GetComponent<AudioSource>();
     }
 
     void Update()
@@ -146,6 +151,9 @@ public class CubeLight : MonoBehaviour
 
         beamLine.SetPosition(0, beamOrigin.position);
         Vector3 hitPoint;
+
+        audioSource.clip = clip;
+        audioSource.Play();
 
         if (Physics.Raycast(ray, out RaycastHit hit, beamRange))
         {

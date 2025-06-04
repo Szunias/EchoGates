@@ -15,9 +15,13 @@ public class RaycastBeam : MonoBehaviour
     LineRenderer beamLine;
     float fireTimer;
 
+    private AudioSource audioSource;
+    [SerializeField] private AudioClip clip;
+
     private void Awake()
     {
         beamLine = GetComponent<LineRenderer>();
+        audioSource = GetComponent<AudioSource>();
     }
 
     private void Update()
@@ -36,6 +40,8 @@ public class RaycastBeam : MonoBehaviour
                 {
                     GameObject objectHit = hit.collider.gameObject;
                     objectHit.GetComponentInParent<TotemLightingUp>().LightUp();
+                    audioSource.clip = clip;
+                    audioSource.Play();
                 }
             }
             else

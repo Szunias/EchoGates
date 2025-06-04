@@ -28,6 +28,8 @@ public class TotemLightingUp : MonoBehaviour
     // Event to notify when the number of lit totems changes
     public static event Action OnLitTotemCountChanged;
 
+    private AudioSource source;
+
     void Awake()
     {
         // If this is the first totem initializing, set the static required count
@@ -40,6 +42,9 @@ public class TotemLightingUp : MonoBehaviour
         }
         staticRequiredTotems = requiredTotemsToWin; // Each totem can report its requirement, the static one takes one.
                                                     // Consider setting this from a GameManager.
+
+        source = GetComponent<AudioSource>();
+
     }
 
     private void Start()
@@ -61,6 +66,7 @@ public class TotemLightingUp : MonoBehaviour
         // Ensure UI is updated on start, especially after a scene reload where static counts might persist
         // if not reset properly by a game manager.
         OnLitTotemCountChanged?.Invoke();
+        source.volume = 0.0f;
     }
 
 
@@ -82,6 +88,7 @@ public class TotemLightingUp : MonoBehaviour
 
         isLit = true;
         litTotemsCount++;
+        source.volume = 1.0f;
 
         Debug.Log($"Totem lit! Current count: {litTotemsCount}/{staticRequiredTotems}");
 

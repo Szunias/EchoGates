@@ -47,12 +47,19 @@ public class ChargingStation : MonoBehaviour
     [Tooltip("Intensity of the station light when charging.")]
     [SerializeField] private float chargingLightIntensity = 2f;
 
+    [Header("Charging Station Subtitles")]
+    [SerializeField] private SubtitleManager subtitleManager;
+    [SerializeField] private string[] firstChargeSubtitleLines;
+    [SerializeField] private float subtitleDelay = 3f; 
+
     private GameObject _instantiatedStationCube;
     private Coroutine _chargeCoroutine;
     private Coroutine _notificationCoroutine;
     private bool _isCharging = false;
     private bool _playerInRange = false;
     private float _originalLightIntensity;
+
+    private bool firstChargeDone = false;
 
     private void Awake()
     {
@@ -203,6 +210,12 @@ public class ChargingStation : MonoBehaviour
         ShowNotification(putInChargerMessage);
         Debug.Log("Charging started. Cube placed in charger.");
 
+        if (!firstChargeDone)
+        {
+            firstChargeDone = true;
+            StartCoroutine(PlayFirstChargeSubtitles()); 
+        } 
+
         if (_chargeCoroutine != null) StopCoroutine(_chargeCoroutine);
         _chargeCoroutine = StartCoroutine(ChargeRoutine());
     }
@@ -333,6 +346,15 @@ public class ChargingStation : MonoBehaviour
             Gizmos.color = Color.green;
             Gizmos.DrawWireSphere(stationCubeSpawnPoint.position, 0.25f);
             Gizmos.DrawLine(stationCubeSpawnPoint.position, stationCubeSpawnPoint.position + stationCubeSpawnPoint.forward * 0.5f);
+        }
+    }
+
+    private IEnumerator PlayFirstChargeSubtitles()
+    {
+        foreach (var line in firstChargeSubtitleLines)
+        {
+            subtitleManager.ShowSubtitle(line);
+            yield return new WaitForSeconds(subtitleManager.textDisplayTime + 0.5f); // optional delay between lines
         }
     }
 }

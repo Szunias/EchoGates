@@ -33,6 +33,11 @@ public class CubeLight : MonoBehaviour
     [SerializeField] private Color emissionColor = Color.cyan;
     [SerializeField] private float emissionIntensity = 2f;
 
+    [Header("Tutorial Subtitles")]
+    [SerializeField] private SubtitleManager subtitleManager; // Drag your SubtitleManager here in inspector
+    [SerializeField] private string[] rightClickSubtitles;     // Subtitles to show after first right click
+    [SerializeField] private float subtitleDelay = 3f;         // Delay between subtitle lines
+
     /* --------------------  RUNTIME -------------------- */
     private Light pointLight;
     private LineRenderer beamLine;
@@ -44,6 +49,8 @@ public class CubeLight : MonoBehaviour
 
     /*  NEW: blokada gaśnięcia emisji w trakcie błysku LMB  */
     private bool beamFlashActive = false;
+
+    private bool rightClickTriggered = false;
 
     /* =================================================== */
     void Start()
@@ -79,6 +86,16 @@ public class CubeLight : MonoBehaviour
     {
         bool rmbHeld = Input.GetMouseButton(1);
         bool enoughEnergy = energy.HasEnergy(0.1f);
+
+        // Detect first right mouse button down (not held)
+        if (!rightClickTriggered && Input.GetMouseButtonDown(1))
+        {
+            rightClickTriggered = true;
+            if (subtitleManager != null && rightClickSubtitles.Length > 0)
+            {
+                StartCoroutine(ShowRightClickSubtitles());
+            }
+        }
 
         if (rmbHeld && enoughEnergy)
         {
@@ -207,5 +224,14 @@ public class CubeLight : MonoBehaviour
         Gizmos.color = Color.yellow;
         Transform center = beamOrigin != null ? beamOrigin : transform;
         Gizmos.DrawWireSphere(center.position, radius);
+    }
+
+    private IEnumerator ShowRightClickSubtitles()
+    {
+        foreach (var line in rightClickSubtitles)
+        {
+            subtitleManager.ShowSubtitle(line);
+            yield return new WaitForSeconds(subtitleDelay);
+        }
     }
 }

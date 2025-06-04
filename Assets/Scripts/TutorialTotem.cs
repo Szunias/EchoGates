@@ -9,6 +9,8 @@ public class TutorialTotem : MonoBehaviour
 
     private bool isLitUp = false;
 
+    public bool IsLit => isLitUp;
+
     void Start()
     {
         rend = GetComponent<Renderer>();

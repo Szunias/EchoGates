@@ -15107,6 +15107,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: StartRoom
       objectReference: {fileID: 0}
+    - target: {fileID: 3267320840158771225, guid: 4359f6f8c4f55d14687c449eba2132fa, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 1.229
+      objectReference: {fileID: 0}
     - target: {fileID: 5511298144334627710, guid: 4359f6f8c4f55d14687c449eba2132fa, type: 3}
       propertyPath: m_LocalPosition.x
       value: -253.58868

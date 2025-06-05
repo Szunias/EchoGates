@@ -386,12 +386,21 @@ public class ChargingStation : MonoBehaviour
         }
     }
 
+    // ZNAJDè T  METOD 
     private IEnumerator PlayFirstChargeSubtitles()
     {
+        // ZMIE— JEJ ZAWARTOå∆ NA PONIØSZ•:
         foreach (var line in firstChargeSubtitleLines)
         {
-            subtitleManager.ShowSubtitle(line);
-            yield return new WaitForSeconds(subtitleManager.textDisplayTime + 0.5f); // optional delay between lines
+            // Uøywamy teraz nowej, globalnej metody
+            if (SubtitleManager.Instance != null)
+            {
+                SubtitleManager.Instance.ShowSubtitle(line);
+            }
+            // Nie musimy juø czekaÊ tutaj, menedøer sam zarzπdza czasem
         }
+        // UsunÍliúmy yield return, poniewaø menedøer sam zarzπdza kolejkπ i opÛünieniami.
+        // DziÍki temu napisy nie blokujπ dzia≥ania stacji ≥adowania.
+        yield break; // ZakoÒcz korutynÍ od razu
     }
 }

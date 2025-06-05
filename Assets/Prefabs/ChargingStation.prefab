@@ -601,9 +601,9 @@ MonoBehaviour:
   clip: {fileID: 8300000, guid: 6d203b54d92dfa44e879548058c1a6fa, type: 3}
   notificationText: {fileID: 0}
   notificationDisplayTime: 1.5
-  putInChargerMessage: Cube placed in charger
+  putInChargerMessage: 'Cube charging '
   retrievedFromChargerMessage: Cube retrieved
-  energyFullMessage: Energy already full!
+  energyFullMessage: Energy full!
   noCubeMessage: No cube in hand to place!
   cubeFullyChargedMessage: Cube fully charged!
   interactionPromptMessage: Press E to charge the cube
@@ -718,7 +718,7 @@ AudioSource:
   m_audioClip: {fileID: 8300000, guid: 0ebad3858b74e7045b8531d0d00adb0b, type: 3}
   m_Resource: {fileID: 8300000, guid: 0ebad3858b74e7045b8531d0d00adb0b, type: 3}
   m_PlayOnAwake: 1
-  m_Volume: 0.64
+  m_Volume: 1
   m_Pitch: 1
   Loop: 1
   Mute: 0

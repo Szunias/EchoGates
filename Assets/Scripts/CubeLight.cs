@@ -35,9 +35,13 @@ public class CubeLight : MonoBehaviour
     [SerializeField] private float emissionIntensity = 2f;
 
     [Header("Tutorial Subtitles")]
-    [SerializeField] private SubtitleManager subtitleManager; // Drag your SubtitleManager here in inspector
-    [SerializeField] private string[] rightClickSubtitles;     // Subtitles to show after first right click
-    [SerializeField] private float subtitleDelay = 3f;         // Delay between subtitle lines
+    [SerializeField] private SubtitleManager subtitleManager;
+    [SerializeField] private string[] rightClickSubtitles;
+    [SerializeField] private float subtitleDelay = 3f;
+
+    [Header("Audio Sources")] // <-- NOWE: Sekcja na źródła dźwięku
+    [SerializeField] private AudioSource audioSourceLightLoop; // <-- NOWE: Przeciągnij tu AudioSource dla dźwięku świecenia (RMB)
+    [SerializeField] private AudioSource audioSourceBeamShot;  // <-- NOWE: Przeciągnij tu AudioSource dla dźwięku strzału (LMB)
 
     /* --------------------  RUNTIME -------------------- */
     private Light pointLight;
@@ -48,23 +52,14 @@ public class CubeLight : MonoBehaviour
     private Material runtimeMat;
     private readonly int emissionID = Shader.PropertyToID("_EmissionColor");
 
-    /*  NEW: blokada gaśnięcia emisji w trakcie błysku LMB  */
     private bool beamFlashActive = false;
-
     private bool rightClickTriggered = false;
 
-    [SerializeField] private AudioSource audioSourceBeam;
-    [SerializeField] private AudioSource audioSourceLight;
-    [SerializeField] private AudioClip beamClip;
-    [SerializeField] private AudioClip lightClip;
+    // Usunięto stare referencje do audio, ponieważ teraz używamy publicznych pól powyżej
 
     /* =================================================== */
     void Start()
     {
-        // Usunięte lub zakomentowane linie:
-        // Cursor.lockState = CursorLockMode.Locked;
-        // Cursor.visible = false;
-
         pointLight = GetComponent<Light>();
         pointLight.type = LightType.Point;
         pointLight.enabled = false;
@@ -80,8 +75,7 @@ public class CubeLight : MonoBehaviour
         runtimeMat.EnableKeyword("_EMISSION");
         SetEmission(false);
 
-        audioSourceLight = GetComponent<AudioSource>();
-        audioSourceBeam = GetComponent<AudioSource>();
+        // Usunięto GetComponent<AudioSource>(), ponieważ teraz przypisujemy źródła w Inspektorze
     }
 
     void Update()
@@ -96,7 +90,6 @@ public class CubeLight : MonoBehaviour
         bool rmbHeld = Input.GetMouseButton(1);
         bool enoughEnergy = energy.HasEnergy(0.1f);
 
-        // Detect first right mouse button down (not held)
         if (!rightClickTriggered && Input.GetMouseButtonDown(1))
         {
             rightClickTriggered = true;
@@ -110,11 +103,12 @@ public class CubeLight : MonoBehaviour
         {
             if (!pointLight.enabled)
             {
-                audioSourceLight.clip = lightClip;
-                audioSourceLight.loop = true;
-                audioSourceLight.pitch = 1.0f;
-                audioSourceLight.Play();
                 pointLight.enabled = true;
+                // <-- NOWE: Odtwórz zapętlony dźwięk świecenia
+                if (audioSourceLightLoop != null)
+                {
+                    audioSourceLightLoop.Play();
+                }
             }
 
             energy.ConsumeEnergy(energyPerSec * Time.deltaTime);
@@ -126,12 +120,16 @@ public class CubeLight : MonoBehaviour
             float stunRadius = useManualStunRadius ? manualStunRadius : pointLight.range;
             StunSpidersInArea(stunRadius, 3f);
 
-            SetEmission(true);                     // świeć w trakcie PPM
+            SetEmission(true);
 
             if (!energy.HasEnergy(0.1f))
             {
                 pointLight.enabled = false;
-                audioSourceLight.Stop();
+                // <-- NOWE: Zatrzymaj dźwięk świecenia, gdy zabraknie energii
+                if (audioSourceLightLoop != null)
+                {
+                    audioSourceLightLoop.Stop();
+                }
             }
         }
         else
@@ -139,10 +137,13 @@ public class CubeLight : MonoBehaviour
             if (pointLight.enabled)
             {
                 pointLight.enabled = false;
-                audioSourceLight.Stop();
+                // <-- NOWE: Zatrzymaj dźwięk świecenia, gdy puścisz przycisk
+                if (audioSourceLightLoop != null)
+                {
+                    audioSourceLightLoop.Stop();
+                }
             }
 
-            /* --- gaś tylko, jeżeli NIE trwa błysk z LMB --- */
             if (!beamFlashActive)
             {
                 SetEmission(false);
@@ -166,29 +167,31 @@ public class CubeLight : MonoBehaviour
 
     private void FireBeam()
     {
-        Ray ray = playerCamera.ScreenPointToRay(
-            new Vector3(Screen.width / 2f, Screen.height / 2f));
+        // <-- NOWE: Odtwórz pojedynczy dźwięk strzału
+        if (audioSourceBeamShot != null)
+        {
+            // Można dodać losową zmianę tonu dla urozmaicenia, jeśli chcesz
+            // audioSourceBeamShot.pitch = Random.Range(0.9f, 1.1f);
+            audioSourceBeamShot.Play();
+        }
 
+        Ray ray = playerCamera.ScreenPointToRay(new Vector3(Screen.width / 2f, Screen.height / 2f));
         beamLine.SetPosition(0, beamOrigin.position);
         Vector3 hitPoint;
 
-        audioSourceBeam.pitch = Random.Range(0.6f, 1.4f);
-        audioSourceBeam.PlayOneShot(beamClip);
+        // Usunięto starą logikę odtwarzania dźwięku
 
         if (Physics.Raycast(ray, out RaycastHit hit, beamRange))
         {
             hitPoint = hit.point;
-
             if (hit.transform.TryGetComponent<spiderAI>(out var spider))
                 spider.Stun(5f);
-
             if (hit.transform.TryGetComponent<TotemLightingUp>(out var totem))
                 totem.LightUp();
             if (hit.transform.TryGetComponent<TutorialTotem>(out var tutorialTotem))
             {
                 tutorialTotem.LightUp();
-            } 
-
+            }
         }
         else
         {
@@ -196,9 +199,8 @@ public class CubeLight : MonoBehaviour
         }
 
         beamLine.SetPosition(1, hitPoint);
-
-        StartCoroutine(FlashEmission());     // błysk sześcianu
-        StartCoroutine(ShootBeam());         // linia laseru
+        StartCoroutine(FlashEmission());
+        StartCoroutine(ShootBeam());
     }
 
     private IEnumerator ShootBeam()
@@ -219,13 +221,11 @@ public class CubeLight : MonoBehaviour
 
     private IEnumerator FlashEmission()
     {
-        beamFlashActive = true;      // blokujemy gaszenie
+        beamFlashActive = true;
         SetEmission(true);
-
         yield return new WaitForSeconds(beamDuration);
-
         beamFlashActive = false;
-        if (!Input.GetMouseButton(1))    // jeśli PPM nieprzytrzymany, gaś
+        if (!Input.GetMouseButton(1))
             SetEmission(false);
     }
 
@@ -244,11 +244,7 @@ public class CubeLight : MonoBehaviour
     private void OnDrawGizmosSelected()
     {
         if (!debugStunSphere) return;
-
-        float radius = useManualStunRadius
-            ? manualStunRadius
-            : (Application.isPlaying && pointLight != null ? pointLight.range : maxLightRange);
-
+        float radius = useManualStunRadius ? manualStunRadius : (Application.isPlaying && pointLight != null ? pointLight.range : maxLightRange);
         Gizmos.color = Color.yellow;
         Transform center = beamOrigin != null ? beamOrigin : transform;
         Gizmos.DrawWireSphere(center.position, radius);

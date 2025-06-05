@@ -20,12 +20,19 @@ public class TotemManager : MonoBehaviour
         }
     }
 
+    // ZNAJDè T  METOD 
     private IEnumerator PlaySubtitlesSequence()
     {
+        // ZMIE— JEJ ZAWARTOå∆ NA PONIØSZ•:
         foreach (string line in totemSubtitles)
         {
-            subtitleManager.ShowSubtitle(line); // using your existing manager
-            yield return new WaitForSeconds(subtitleManager.textDisplayTime + 0.5f);
+            // Uøywamy nowej, globalnej metody
+            if (SubtitleManager.Instance != null)
+            {
+                SubtitleManager.Instance.ShowSubtitle(line);
+            }
         }
+        // Tutaj rÛwnieø usuwamy yield return, aby nie blokowaÊ logiki.
+        yield break;
     }
 }

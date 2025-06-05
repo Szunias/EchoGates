@@ -1,6 +1,6 @@
 using UnityEngine;
-using System.Linq;    // Required for checking all totems easily
-using System.Collections; // Required for Coroutines
+using System.Linq;
+using System.Collections;
 
 public class SpawnTeleport : MonoBehaviour
 {
@@ -13,7 +13,7 @@ public class SpawnTeleport : MonoBehaviour
 
     [Header("Door Cube Settings")]
     [Tooltip("The GameObject representing the door cube that will rotate (this should be the Hinge/Pivot object if you set one up).")]
-    [SerializeField] private GameObject doorCube; // This should be the Hinge/Pivot
+    [SerializeField] private GameObject doorCube;
 
     [Tooltip("The rotation to apply to the door cube to open it (e.g., (0, 90, 0) for 90 degrees on Y axis).")]
     [SerializeField] private Vector3 doorOpenRotationAngle = new Vector3(0, 90, 0);
@@ -21,93 +21,79 @@ public class SpawnTeleport : MonoBehaviour
     [Tooltip("How long the door cube rotation should take.")]
     [SerializeField] private float doorRotationDuration = 1.0f;
 
-    [Header("Door Sound Settings")] // NEW SECTION
+    [Header("Door Sound Settings")]
     [Tooltip("The sound to play when the door starts opening.")]
-    [SerializeField] private AudioClip doorOpenSound; // NEW: AudioClip for the sound
+    [SerializeField] private AudioClip doorOpenSound;
 
-    [Tooltip("The AudioSource component that will play the door open sound. Can be on the door, teleport, or a sound manager.")]
-    [SerializeField] private AudioSource doorAudioSource; // NEW: AudioSource to play the sound
+    [Tooltip("The AudioSource component that will play the door open sound.")]
+    [SerializeField] private AudioSource doorAudioSource;
 
     private bool conditionsMetForOpening = false;
     private bool isDoorCubeOpen = false;
 
     private void Update()
     {
-        if (isDoorCubeOpen)
+        if (isDoorCubeOpen || !CubePickup.hasCube)
         {
             return;
         }
 
-        if (!CubePickup.hasCube)
-        {
-            conditionsMetForOpening = false;
-            return;
-        }
-
+        bool allTotemsLit = true;
         if (totemsRequiredForTeleport != null && totemsRequiredForTeleport.Length > 0)
         {
+            // Check for unassigned totems first
             if (totemsRequiredForTeleport.Any(totem => totem == null))
             {
-                if (!conditionsMetForOpening)
-                    Debug.LogError("Teleport/Door inactive: One or more totems in 'Totems Required For Teleport' are not assigned!", this.gameObject);
-                conditionsMetForOpening = false;
+                Debug.LogError("Teleport/Door inactive: One or more totems are not assigned!", this.gameObject);
                 return;
             }
-
+            // Check if all assigned totems are lit
             if (!totemsRequiredForTeleport.All(totem => totem.IsLit))
             {
-                conditionsMetForOpening = false;
-                return;
+                allTotemsLit = false;
             }
         }
 
-        conditionsMetForOpening = true;
-
-        if (doorCube != null && !isDoorCubeOpen) // isDoorCubeOpen check ensures this block runs once
+        // If conditions were not met before, but are now met
+        if (!conditionsMetForOpening && allTotemsLit)
         {
+            conditionsMetForOpening = true;
             Debug.Log("Conditions met. Opening door cube and playing sound...");
 
-            // --- PLAY DOOR OPEN SOUND ---
+            // Play sound
             if (doorAudioSource != null && doorOpenSound != null)
             {
-                doorAudioSource.PlayOneShot(doorOpenSound); // Play the sound
+                doorAudioSource.PlayOneShot(doorOpenSound);
             }
-            else
-            {
-                if (doorOpenSound != null && doorAudioSource == null)
-                {
-                    Debug.LogWarning("Door Open Sound is assigned, but Door Audio Source is not! Cannot play sound on " + gameObject.name);
-                }
-                // If doorOpenSound is null, no warning is needed, it's optional.
-            }
-            // ----------------------------
 
-            StartCoroutine(RotateDoorCubeCoroutine());
-            isDoorCubeOpen = true;
+            // Start rotating door
+            if (doorCube != null)
+            {
+                StartCoroutine(RotateDoorCubeCoroutine());
+                isDoorCubeOpen = true;
+            }
         }
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        if (!other.CompareTag("Player"))
+        if (!other.CompareTag("Player") || !conditionsMetForOpening)
         {
-            return;
-        }
-
-        if (!conditionsMetForOpening)
-        {
-            if (!CubePickup.hasCube)
-            {
-                Debug.Log("Teleport inactive: Cube not picked up yet.");
-            }
-            else
-            {
-                Debug.Log("Teleport inactive: Not all required totems are lit (or check Inspector setup).");
-            }
             return;
         }
 
         Debug.Log("Player entered teleport trigger, and all conditions are met. Teleporting...");
+
+        // --- HIDE SUBTITLES AND STOP TUTORIAL ---
+        if (SubtitleManager.Instance != null)
+        {
+            SubtitleManager.Instance.HideAndClear();
+        }
+        if (Tutorial.Instance != null)
+        {
+            Tutorial.Instance.StopTutorial();
+        }
+        // ------------------------------------------
 
         var controller = other.GetComponent<CharacterController>();
         if (controller != null)

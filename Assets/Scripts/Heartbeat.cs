@@ -21,6 +21,7 @@ public class Heartbeat : MonoBehaviour
         Vector3 currentSpiderPosition = spider.transform.position;
         float distanceFromSpider = Vector3.Distance(currentPosition, currentSpiderPosition);
         source.pitch = Mathf.Lerp(source.pitch, GetPitch(distanceFromSpider), Time.deltaTime * 5f);
+        source.volume = Mathf.Lerp(source.volume, GetPitch(distanceFromSpider), Time.deltaTime * 5f);
         previousPlayerPosition = currentPosition;
         previousSpiderPosition = currentSpiderPosition;
     }

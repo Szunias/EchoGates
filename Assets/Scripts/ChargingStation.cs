@@ -13,6 +13,10 @@ public class ChargingStation : MonoBehaviour
     [Tooltip("The Light component on this Charging Station that will activate during charging.")]
     [SerializeField] private Light stationLight;
 
+    [Header("Audio")]
+    [SerializeField] private AudioSource source;
+    [SerializeField] private AudioClip clip;
+
     [Header("UI Notification (TextMeshPro)")] // Zmieniono nazwê sekcji dla jasnoœci
     [Tooltip("TextMeshProUGUI element to display notifications.")]
     [SerializeField] private TextMeshProUGUI notificationText; // WA¯NE: Zmieniono typ na TextMeshProUGUI
@@ -207,6 +211,7 @@ public class ChargingStation : MonoBehaviour
         }
         else
         {
+            source.Stop();
             RetrieveChargedCube();
         }
     }
@@ -236,6 +241,8 @@ public class ChargingStation : MonoBehaviour
         _instantiatedStationCube = Instantiate(cubePrefabOnStation, stationCubeSpawnPoint.position, stationCubeSpawnPoint.rotation, stationCubeSpawnPoint);
 
         _isCharging = true;
+        source.clip = clip;
+        source.Play();
         TurnOnStationLight();
         ShowNotification(putInChargerMessage);
         Debug.Log("Charging started. Cube placed in charger.");

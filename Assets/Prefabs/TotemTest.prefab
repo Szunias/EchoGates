@@ -107,6 +107,7 @@ MonoBehaviour:
   totemLightSource: {fileID: 0}
   cageObject: {fileID: 0}
   requiredTotemsToWin: 5
+  activeClip: {fileID: 8300000, guid: 9fc86fe1a2ab8604db7be844e237cdbd, type: 3}
 --- !u!114 &3068676873731279864
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -518,14 +519,14 @@ AudioSource:
   m_GameObject: {fileID: 3436746021262392523}
   m_Enabled: 1
   serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 6735429910509597638, guid: a74bec50e40940240acc67fc0067d430, type: 2}
+  OutputAudioMixerGroup: {fileID: 9197222661464411679, guid: a74bec50e40940240acc67fc0067d430, type: 2}
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 0}
-  m_PlayOnAwake: 1
-  m_Volume: 0.318
+  m_PlayOnAwake: 0
+  m_Volume: 1
   m_Pitch: 1
-  Loop: 1
-  Mute: 1
+  Loop: 0
+  Mute: 0
   Spatialize: 0
   SpatializePostEffects: 0
   Priority: 128

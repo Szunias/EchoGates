@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Runtime.CompilerServices;
 
 [RequireComponent(typeof(Light), typeof(LineRenderer), typeof(Renderer))]
 public class CubeLight : MonoBehaviour
@@ -52,7 +53,8 @@ public class CubeLight : MonoBehaviour
 
     private bool rightClickTriggered = false;
 
-    private AudioSource audioSource;
+    [SerializeField] private AudioSource audioSourceBeam;
+    [SerializeField] private AudioSource audioSourceLight;
     [SerializeField] private AudioClip beamClip;
     [SerializeField] private AudioClip lightClip;
 
@@ -78,7 +80,8 @@ public class CubeLight : MonoBehaviour
         runtimeMat.EnableKeyword("_EMISSION");
         SetEmission(false);
 
-        audioSource = GetComponent<AudioSource>();
+        audioSourceLight = GetComponent<AudioSource>();
+        audioSourceBeam = GetComponent<AudioSource>();
     }
 
     void Update()
@@ -107,10 +110,10 @@ public class CubeLight : MonoBehaviour
         {
             if (!pointLight.enabled)
             {
-                audioSource.clip = lightClip;
-                audioSource.loop = true;
-                audioSource.pitch = 1.0f;
-                audioSource.Play();
+                audioSourceLight.clip = lightClip;
+                audioSourceLight.loop = true;
+                audioSourceLight.pitch = 1.0f;
+                audioSourceLight.Play();
                 pointLight.enabled = true;
             }
 
@@ -128,18 +131,22 @@ public class CubeLight : MonoBehaviour
             if (!energy.HasEnergy(0.1f))
             {
                 pointLight.enabled = false;
-                audioSource.Stop();
+                audioSourceLight.Stop();
             }
         }
         else
         {
-            if (pointLight.enabled) pointLight.enabled = false;
-            audioSource.Stop();
-            audioSource.loop = false;
+            if (pointLight.enabled)
+            {
+                pointLight.enabled = false;
+                audioSourceLight.Stop();
+            }
 
             /* --- gaś tylko, jeżeli NIE trwa błysk z LMB --- */
             if (!beamFlashActive)
+            {
                 SetEmission(false);
+            }
         }
     }
 
@@ -165,9 +172,8 @@ public class CubeLight : MonoBehaviour
         beamLine.SetPosition(0, beamOrigin.position);
         Vector3 hitPoint;
 
-        audioSource.pitch = Random.Range(0.7f, 1.3f);
-        audioSource.PlayOneShot(beamClip);
-        audioSource.pitch = 1.0f;
+        audioSourceBeam.pitch = Random.Range(0.6f, 1.4f);
+        audioSourceBeam.PlayOneShot(beamClip);
 
         if (Physics.Raycast(ray, out RaycastHit hit, beamRange))
         {

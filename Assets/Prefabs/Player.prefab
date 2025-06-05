@@ -526,7 +526,7 @@ AudioSource:
   m_audioClip: {fileID: 8300000, guid: a472aa52860248c49a983a7fd849af25, type: 3}
   m_Resource: {fileID: 8300000, guid: a472aa52860248c49a983a7fd849af25, type: 3}
   m_PlayOnAwake: 1
-  m_Volume: 0.051
+  m_Volume: 0.025
   m_Pitch: 1
   Loop: 1
   Mute: 0
@@ -765,6 +765,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: Cube
       objectReference: {fileID: 0}
+    - target: {fileID: 3651701892484107988, guid: 8a94f7c47eac67a45899c535fd7a5023, type: 3}
+      propertyPath: beamClip
+      value: 
+      objectReference: {fileID: 8300000, guid: 715efb70bc6750b4cab6ff3a9f141b45, type: 3}
+    - target: {fileID: 3651701892484107988, guid: 8a94f7c47eac67a45899c535fd7a5023, type: 3}
+      propertyPath: lightClip
+      value: 
+      objectReference: {fileID: 8300000, guid: 5d26c52b3259d074e985b6423d481e21, type: 3}
     - target: {fileID: 3651701892484107988, guid: 8a94f7c47eac67a45899c535fd7a5023, type: 3}
       propertyPath: playerCamera
       value: 

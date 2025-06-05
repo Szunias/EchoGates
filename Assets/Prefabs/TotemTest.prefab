@@ -519,13 +519,13 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 6735429910509597638, guid: a74bec50e40940240acc67fc0067d430, type: 2}
-  m_audioClip: {fileID: 8300000, guid: 5d26c52b3259d074e985b6423d481e21, type: 3}
-  m_Resource: {fileID: 8300000, guid: 5d26c52b3259d074e985b6423d481e21, type: 3}
+  m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 0}
   m_PlayOnAwake: 1
   m_Volume: 0.318
   m_Pitch: 1
   Loop: 1
-  Mute: 0
+  Mute: 1
   Spatialize: 0
   SpatializePostEffects: 0
   Priority: 128

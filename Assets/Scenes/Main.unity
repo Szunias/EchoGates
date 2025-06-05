@@ -14740,8 +14740,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   subtitleText: {fileID: 857459939}
   backgroundImage: {fileID: 0}
-  textDisplayTime: 4
-  initialDelay: 2
+  textDisplayTime: 1.5
+  initialDelay: 1
 --- !u!224 &1319111135
 RectTransform:
   m_ObjectHideFlags: 0
@@ -18747,7 +18747,7 @@ PrefabInstance:
       objectReference: {fileID: 1875810596}
     - target: {fileID: 1048843771528338081, guid: 26ee572e346e92a40bf0c7e4ded79f9b, type: 3}
       propertyPath: subtitleDelay
-      value: 2.5
+      value: 1.5
       objectReference: {fileID: 0}
     - target: {fileID: 1048843771528338081, guid: 26ee572e346e92a40bf0c7e4ded79f9b, type: 3}
       propertyPath: generatorLight
@@ -25274,7 +25274,7 @@ PrefabInstance:
       objectReference: {fileID: 1397483349}
     - target: {fileID: 8781303817143197852, guid: 98db70db9a0b3b3459e4293c1a6e5e11, type: 3}
       propertyPath: subtitleDelay
-      value: 2
+      value: 1.5
       objectReference: {fileID: 0}
     - target: {fileID: 8781303817143197852, guid: 98db70db9a0b3b3459e4293c1a6e5e11, type: 3}
       propertyPath: subtitleManager

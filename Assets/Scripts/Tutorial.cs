@@ -13,8 +13,8 @@ public class Tutorial : MonoBehaviour
     private IEnumerator PlayTutorialSequence()
     {
         subtitleManager.ShowSubtitle("What is that on the table?");
-        yield return new WaitForSeconds(2f);
+        yield return new WaitForSeconds(1.5f);
         subtitleManager.ShowSubtitle("Is that... Captain Sniffles?");
-        yield return new WaitForSeconds(2f);
+        yield return new WaitForSeconds(1.5f);
     }
 }

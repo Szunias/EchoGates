@@ -125,8 +125,8 @@ Light:
   serializedVersion: 11
   m_Type: 2
   m_Color: {r: 1, g: 0.9322072, b: 0.5566037, a: 1}
-  m_Intensity: 100
-  m_Range: 15
+  m_Intensity: 200
+  m_Range: 60
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
   m_CookieSize: 10
@@ -301,10 +301,10 @@ MonoBehaviour:
   playerCamera: {fileID: 0}
   beamOrigin: {fileID: 5043914745287840676}
   energy: {fileID: 0}
-  maxLightRange: 15
-  maxIntensity: 100
+  maxLightRange: 60
+  maxIntensity: 300
   energyPerSec: 2
-  beamRange: 100
+  beamRange: 70
   fireRate: 0.5
   beamDuration: 0.5
   beamEnergyCost: 10

@@ -1,137 +1,112 @@
+// --- SubtitleManager.cs (TextMeshPro Version) ---
 using UnityEngine;
 using System.Collections;
-using System.Collections.Generic; // Required for using the Queue
+using System.Collections.Generic;
 using TMPro;
-using UnityEngine.UI;
+using UnityEngine.UI; // Still needed for the legacy Image if you keep it, but not for the new fields.
 
 public class SubtitleManager : MonoBehaviour
 {
-    // --- SINGLETON PATTERN ---
-    // This allows easy access to the manager from anywhere in the code
-    // by writing: SubtitleManager.Instance.ShowSubtitle("...")
     public static SubtitleManager Instance { get; private set; }
 
-    [Header("UI References")]
+    [Header("UI References (TextMeshPro)")]
     public TextMeshProUGUI subtitleText;
-    public Image backgroundImage;
 
-    [Header("Timing Settings")]
-    public float defaultDisplayTime = 4f; // Default duration for a subtitle to be on screen
-    public float delayBetweenSubtitles = 0.5f; // A short pause between consecutive subtitles in the queue
+    // CHANGED: Replaced Image with TextMeshProUGUI
+    [Tooltip("Optional TextMeshPro object used as a background panel.")]
+    public TextMeshProUGUI backgroundText;
 
-    // --- QUEUE SYSTEM ---
-    private Queue<SubtitleRequest> subtitleQueue; // A queue that holds subtitle requests
-    private Coroutine displayCoroutine;           // A reference to the main coroutine that manages the queue
+    // CHANGED: Replaced Image with TextMeshProUGUI
+    [Tooltip("The TextMeshPro object that displays the 'Press Enter' prompt.")]
+    public TextMeshProUGUI continuePromptText;
 
-    // A small struct to hold the text and duration for each subtitle request
-    private struct SubtitleRequest
-    {
-        public string Text;
-        public float Duration;
-    }
+    [Header("Dependencies")]
+    [Tooltip("A reference to the player's movement script to disable/enable it.")]
+    public PlayerMovement playerMovement;
+
+    private Queue<string> subtitleQueue = new Queue<string>();
+    private bool isWaitingForInput = false;
+
+    public bool IsQueueEmpty => subtitleQueue.Count == 0;
+    public bool IsDisplaying { get; private set; }
 
     private void Awake()
     {
-        // --- Singleton Setup ---
-        if (Instance != null && Instance != this)
-        {
-            Destroy(gameObject); // If another instance already exists, destroy this one.
-        }
-        else
-        {
-            Instance = this;
-            // Optional: DontDestroyOnLoad(gameObject); // If the manager should persist across scene loads
-        }
+        if (Instance != null && Instance != this) { Destroy(gameObject); }
+        else { Instance = this; }
 
-        subtitleQueue = new Queue<SubtitleRequest>();
-        // Hide UI elements on start
-        if (subtitleText != null) subtitleText.gameObject.SetActive(false);
-        if (backgroundImage != null) backgroundImage.gameObject.SetActive(false);
+        HideAllUI();
     }
 
     private void Start()
     {
-        // Start the main loop that will manage the queue
-        displayCoroutine = StartCoroutine(SubtitleDisplayLoop());
+        StartCoroutine(SubtitleDisplayLoop());
     }
 
-    /// <summary>
-    /// Public method to add a new subtitle to the queue.
-    /// </summary>
-    /// <param name="text">The text to display.</param>
-    /// <param name="duration">Optional display duration. If -1, the default time will be used.</param>
-    public void ShowSubtitle(string text, float duration = -1f)
+    private void Update()
+    {
+        if (isWaitingForInput && (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter)))
+        {
+            isWaitingForInput = false;
+        }
+    }
+
+    public void ShowSubtitle(string text)
     {
         if (string.IsNullOrEmpty(text)) return;
-
-        // Create a new subtitle request and add it to the queue
-        SubtitleRequest newRequest = new SubtitleRequest
-        {
-            Text = text,
-            Duration = duration > 0 ? duration : defaultDisplayTime
-        };
-        subtitleQueue.Enqueue(newRequest);
+        subtitleQueue.Enqueue(text);
     }
 
-    /// <summary>
-    /// Public method to immediately hide the current subtitle and clear the entire queue.
-    /// </summary>
     public void HideAndClear()
     {
-        Debug.Log("SubtitleManager: Clearing queue and hiding subtitles.");
-        subtitleQueue.Clear(); // Clear all pending subtitles
-
-        // Stop and restart the main loop to interrupt the current display
-        if (displayCoroutine != null)
-        {
-            StopCoroutine(displayCoroutine);
-        }
-        displayCoroutine = StartCoroutine(SubtitleDisplayLoop());
-
-        // Immediately hide the UI elements
-        if (subtitleText != null) subtitleText.gameObject.SetActive(false);
-        if (backgroundImage != null) backgroundImage.gameObject.SetActive(false);
+        subtitleQueue.Clear();
+        isWaitingForInput = false;
+        HideAllUI();
+        if (playerMovement != null) { playerMovement.EnableMovement(); }
+        IsDisplaying = false;
     }
 
-    /// <summary>
-    /// The main coroutine loop that constantly checks the queue and displays subtitles.
-    /// </summary>
     private IEnumerator SubtitleDisplayLoop()
     {
-        while (true) // This loop runs continuously in the background
+        while (true)
         {
-            // If there are any subtitles in the queue...
-            if (subtitleQueue.Count > 0)
-            {
-                // ...get the next one from the queue.
-                SubtitleRequest request = subtitleQueue.Dequeue();
+            yield return new WaitUntil(() => subtitleQueue.Count > 0);
 
-                // --- Show Subtitle ---
-                subtitleText.text = request.Text;
+            IsDisplaying = true;
+            if (playerMovement != null) { playerMovement.DisableMovement(); }
+
+            while (subtitleQueue.Count > 0)
+            {
+                string textToShow = subtitleQueue.Dequeue();
+
+                // Show UI elements
+                subtitleText.text = textToShow;
                 subtitleText.gameObject.SetActive(true);
-                if (backgroundImage != null)
-                {
-                    backgroundImage.gameObject.SetActive(true);
-                }
 
-                // Wait for the specified duration
-                yield return new WaitForSeconds(request.Duration);
+                // CHANGED: Now interacts with backgroundText instead of backgroundImage
+                if (backgroundText != null) backgroundText.gameObject.SetActive(true);
+                // CHANGED: Now interacts with continuePromptText instead of continuePromptImage
+                if (continuePromptText != null) continuePromptText.gameObject.SetActive(true);
 
-                // --- Hide Subtitle ---
-                subtitleText.gameObject.SetActive(false);
-                if (backgroundImage != null)
-                {
-                    backgroundImage.gameObject.SetActive(false);
-                }
+                isWaitingForInput = true;
+                yield return new WaitUntil(() => !isWaitingForInput);
 
-                // Wait for a short moment before displaying the next subtitle
-                yield return new WaitForSeconds(delayBetweenSubtitles);
+                // CHANGED: Hides the text prompt after input
+                if (continuePromptText != null) continuePromptText.gameObject.SetActive(false);
             }
-            else
-            {
-                // If the queue is empty, just wait for the next frame
-                yield return null;
-            }
+
+            IsDisplaying = false;
+            HideAllUI();
+            if (playerMovement != null) { playerMovement.EnableMovement(); }
         }
+    }
+
+    private void HideAllUI()
+    {
+        if (subtitleText != null) subtitleText.gameObject.SetActive(false);
+        // CHANGED: Hides the text background
+        if (backgroundText != null) backgroundText.gameObject.SetActive(false);
+        // CHANGED: Hides the text prompt
+        if (continuePromptText != null) continuePromptText.gameObject.SetActive(false);
     }
 }

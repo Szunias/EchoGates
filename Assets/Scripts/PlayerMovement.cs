@@ -1,182 +1,149 @@
-﻿using System.Runtime.CompilerServices;
-
+﻿
 using UnityEngine;
-// using UnityEngine.InputSystem; // This was in your script, but not used by the GetAxis calls. Remove if not using Input System package actions.
-
 
 public class PlayerMovement : MonoBehaviour
 {
+    [Header("Movement Settings")]
     [SerializeField] private float moveSpeed = 16f;
     [SerializeField] private float sprintSpeed = 24f;
-    [SerializeField] private Stamina staminaSystem;
-
-    [SerializeField] private GameObject inventoryObject;
-    [SerializeField] private GameObject cameraObject;
-
-    // Added by user:
     [SerializeField] private float jumpHeight = 1.5f;
     [SerializeField] private float gravity = -9.81f;
-    private bool inInventory = false;
-    private float verticalVelocity;
-    private bool inTutorial = false; // Backing field for Intutorial property
 
-    // Property as provided by user (lowercase 't')
-    public bool Intutorial { set { inTutorial = value; } }
+    [Header("System References")]
+    [SerializeField] private Stamina staminaSystem;
+    [SerializeField] private GameObject cameraObject;
+    // Usunięto pole: [SerializeField] private GameObject inventoryObject;
 
-    private CharacterController characterController;
-    private Camera camera; // Using 'new' to hide any potential inherited member
-
-    // Audio
-    private AudioSource source;
-    private Vector3 previousPosition;   
-    private float totalDistance = 0;
+    [Header("Footstep Audio")]
     [Tooltip("Sound effects for wood")][SerializeField] private GameObject woodSteps;
     [Tooltip("Sound effects for grass")][SerializeField] private GameObject grassSteps;
     [Tooltip("Sound effects for carpet")][SerializeField] private GameObject carpetSteps;
 
+    // --- State Control ---
+    private bool movementDisabled = false; // Flaga do blokowania ruchu z innych skryptów (np. SubtitleManager)
+
+    // --- Private Components & Variables ---
+    private CharacterController characterController;
+    private new Camera camera;
+    private AudioSource source;
+    private Vector3 verticalVelocity;
+    private Vector3 previousPosition;
+    private float totalDistance = 0;
+
     private void Start()
     {
         characterController = GetComponent<CharacterController>();
-
-        // Get Stamina component from this GameObject if not assigned in Inspector
-        if (staminaSystem == null)
-        {
-            staminaSystem = GetComponent<Stamina>();
-            if (staminaSystem == null)
-            {
-                Debug.LogError("PlayerMovement: Stamina system not found on the player or not assigned.", this.gameObject);
-            }
-        }
-
-        // Assign camera from the specified cameraObject or use the main camera as a fallback
-        if (cameraObject != null)
-        {
-            camera = cameraObject.GetComponent<Camera>();
-            if (camera == null)
-            {
-                Debug.LogError("PlayerMovement: Camera component not found on the assigned cameraObject. Falling back to Camera.main.", this.gameObject);
-                camera = Camera.main;
-            }
-        }
-        else
-        {
-            camera = Camera.main;
-        }
-
-        if (camera == null)
-        {
-            Debug.LogError("PlayerMovement: No camera found (neither assigned nor Camera.main). Movement might not work as expected.", this.gameObject);
-        }
-
         source = GetComponent<AudioSource>();
+
+        if (staminaSystem == null) { staminaSystem = GetComponent<Stamina>(); }
+        if (staminaSystem == null) { Debug.LogError("PlayerMovement: Stamina system not found or assigned.", this); }
+
+        if (cameraObject != null) { camera = cameraObject.GetComponent<Camera>(); }
+        if (camera == null) { camera = Camera.main; }
+        if (camera == null) { Debug.LogError("PlayerMovement: No camera found. Movement will be world-relative.", this); }
+
+        previousPosition = transform.position;
     }
 
     private void Update()
     {
-        Vector3 currentPosition = transform.localPosition;
-        float distance = Mathf.Abs(Vector3.Magnitude(currentPosition - previousPosition));
-        float pitch = GetPitchFromDistance(distance);
-        source.pitch = pitch;
-        totalDistance = totalDistance + distance;
+        // --- MASTER MOVEMENT CHECK ---
+        // Usunięto sprawdzanie 'inInventory'. Teraz tylko 'movementDisabled' może zablokować ruch.
+        if (movementDisabled)
+        {
+            // Możesz zostawić ten log do testów lub go usunąć
+            // Debug.LogWarning($"Movement BLOCKED. Reason: movementDisabled={movementDisabled}");
+            return;
+        }
 
-        // Audio
+        HandleMovement();
+        HandleFootsteps();
+    }
+
+    private void HandleMovement()
+    {
+        // --- Jump and gravity ---
+        if (characterController.isGrounded && verticalVelocity.y < 0f)
+        {
+            verticalVelocity.y = -2f;
+        }
+
+        if (Input.GetButtonDown("Jump") && characterController.isGrounded)
+        {
+            verticalVelocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
+        }
+        verticalVelocity.y += gravity * Time.deltaTime;
+
+        // --- Horizontal Movement ---
+        float horizontalInput = Input.GetAxis("Horizontal");
+        float verticalInput = Input.GetAxis("Vertical");
+        Vector3 input = new Vector3(horizontalInput, 0f, verticalInput);
+
+        Vector3 forward = camera != null ? camera.transform.forward : Vector3.forward;
+        Vector3 right = camera != null ? camera.transform.right : Vector3.right;
+        forward.y = 0;
+        right.y = 0;
+        forward.Normalize();
+        right.Normalize();
+
+        Vector3 direction = forward * input.z + right * input.x;
+
+        // --- Sprinting ---
+        bool isMoving = direction.sqrMagnitude > 0.01f;
+        bool canSprint = Input.GetKey(KeyCode.LeftShift) && staminaSystem != null && staminaSystem.HasStamina() && isMoving;
+        float currentSpeed = canSprint ? sprintSpeed : moveSpeed;
+
+        // --- Apply Movement ---
+        Vector3 move = direction.normalized * currentSpeed;
+        move.y = verticalVelocity.y;
+        characterController.Move(move * Time.deltaTime);
+    }
+
+    private void HandleFootsteps()
+    {
+        Vector3 currentPosition = transform.position;
+        float distance = Vector3.Distance(currentPosition, previousPosition);
+        totalDistance += distance;
+
         if (totalDistance >= 8.4f)
         {
-            Vector3 rayOrigin = transform.position;
+            totalDistance = 0;
             RaycastHit hit;
-            if (Physics.Raycast(rayOrigin, Vector3.down, out hit, 6f))
+            if (Physics.Raycast(transform.position, Vector3.down, out hit, 6f))
             {
-                if (LayerMask.LayerToName(hit.collider.gameObject.layer) == "Wood")
+                GameObject stepPrefab = null;
+                string layerName = LayerMask.LayerToName(hit.collider.gameObject.layer);
+
+                if (layerName == "Wood") stepPrefab = woodSteps;
+                else if (layerName == "Carpet") stepPrefab = carpetSteps;
+                else stepPrefab = grassSteps; // Domyślnie trawa
+
+                if (stepPrefab != null)
                 {
-                    GameObject woodenFootsteps = Instantiate(woodSteps);
-                    woodenFootsteps.transform.position = transform.position;
-                    totalDistance = 0;
-                }
-                else if (LayerMask.LayerToName(hit.collider.gameObject.layer) == "Ground")
-                {
-                    GameObject grassFootsteps = Instantiate(grassSteps);
-                    grassFootsteps.transform.position = transform.position;
-                    totalDistance = 0;
-                }
-                else if (LayerMask.LayerToName(hit.collider.gameObject.layer) == "Carpet")
-                {
-                    GameObject carpetFootsteps = Instantiate(carpetSteps);
-                    carpetFootsteps.transform.position = transform.position;
-                    totalDistance = 0;
-                }
-                else //failsafe
-                {
-                    GameObject grassFootsteps = Instantiate(grassSteps);
-                    grassFootsteps.transform.position = transform.position;
-                    totalDistance = 0;
+                    Instantiate(stepPrefab, transform.position, Quaternion.identity);
                 }
             }
         }
         previousPosition = currentPosition;
-
-        // Only allow movement if not in inventory and not in the tutorial state
-        if (!inInventory && !inTutorial) // Check the backing field directly for read access
-        {
-            // --- Jump and gravity ---
-            if (characterController.isGrounded && verticalVelocity < 0f)
-            {
-                verticalVelocity = -2f; // Small downward force when grounded
-            }
-
-            if (Input.GetButtonDown("Jump") && characterController.isGrounded)
-            {
-                verticalVelocity = Mathf.Sqrt(jumpHeight * -2f * gravity);
-            }
-            verticalVelocity += gravity * Time.deltaTime; // Apply gravity
-
-            // --- Movement + sprint + stamina ---
-            float horizontalInput = Input.GetAxis("Horizontal");
-            float verticalInput = Input.GetAxis("Vertical");
-            Vector3 input = new Vector3(horizontalInput, 0f, verticalInput);
-
-            // Calculate movement direction relative to camera
-            Vector3 forward = Vector3.zero;
-            Vector3 right = Vector3.zero;
-
-            if (camera != null)
-            {
-                forward = camera.transform.forward;
-                right = camera.transform.right;
-            }
-            forward.y = 0; // Keep movement planar
-            right.y = 0;   // Keep movement planar
-            // Normalizing camera vectors can be good practice if camera has non-unit scale or unusual pitch.
-            // forward.Normalize();
-            // right.Normalize();
-
-            // Original direction calculation from your script
-            Vector3 direction = forward * input.z + right * input.x;
-
-            // Determine if sprinting
-            // Player must be trying to move for sprint speed to apply (input.sqrMagnitude check)
-            bool isActuallyMoving = input.sqrMagnitude > 0.01f;
-            bool canSprint = Input.GetKey(KeyCode.LeftShift)
-                                && staminaSystem != null
-                                && staminaSystem.HasStamina()
-                                && isActuallyMoving; // Only allow sprint if actually moving
-
-            float speed = canSprint ? sprintSpeed : moveSpeed;
-
-            // If not normalizing 'direction' before multiplying by speed, diagonal movement will be faster.
-            // To ensure consistent speed in all directions, normalize 'direction' if input is significant:
-            // if (isActuallyMoving) direction.Normalize();
-            Vector3 move = direction.normalized * speed; // Normalized direction for consistent speed
-            if (!isActuallyMoving) move = Vector3.zero; // Ensure no movement if no input, even if direction was calculated from tiny joystick drift
-
-            move.y = verticalVelocity; // Add vertical movement (jump/gravity)
-
-            characterController.Move(move * Time.deltaTime);
-            // --------------------------------------------
-        }
     }
 
-    private float GetPitchFromDistance(float distance)
+    // --- PUBLIC METHODS FOR EXTERNAL CONTROL ---
+
+    /// <summary>
+    /// Disables player movement. Called by other scripts like SubtitleManager.
+    /// </summary>
+    public void DisableMovement()
     {
-        return Mathf.Clamp(1f + (distance / 5f), 0.5f, 2f);
+        movementDisabled = true;
+        Debug.Log("<color=red>PlayerMovement: Movement DISABLED by an external script.</color>");
+    }
+
+    /// <summary>
+    /// Enables player movement. Called by other scripts like SubtitleManager.
+    /// </summary>
+    public void EnableMovement()
+    {
+        movementDisabled = false;
+        Debug.Log("<color=green>PlayerMovement: Movement ENABLED by an external script.</color>");
     }
 }

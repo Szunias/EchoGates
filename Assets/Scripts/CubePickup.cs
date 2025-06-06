@@ -1,3 +1,4 @@
+// --- CubePickup.cs ---
 using UnityEngine;
 
 public class CubePickup : MonoBehaviour
@@ -8,25 +9,18 @@ public class CubePickup : MonoBehaviour
     [SerializeField] private string pickupPrompt = "Press E to pick up";
 
     [Header("CubeLight Reference")]
-    [SerializeField] private GameObject existingCubeLight; // Przeci¹gnij tutaj CubeLight z hierarchy
+    [SerializeField] private GameObject existingCubeLight;
 
     private bool playerInRange = false;
     private GameObject player;
-    public FlickeringLight flickeringLight; // Drag in the Inspector
+    public FlickeringLight flickeringLight;
     public GameObject myCanvas;
 
-    // --- NOWA ZMIENNA STATYCZNA ---
     public static bool hasCube = false;
-    // -----------------------------
 
     void Start()
     {
-        // Resetuj stan przy starcie sceny (jeœli to konieczne, np. przy ponownym ³adowaniu poziomu)
-        // Jeœli chcesz, aby stan by³ zachowany miêdzy scenami, musia³byœ u¿yæ np. DontDestroyOnLoad dla obiektu zarz¹dzaj¹cego stanem gry.
-        // Dla prostoty tego przyk³adu, resetujemy go tutaj.
-        // Jeœli masz mened¿era gry, lepiej zarz¹dzaæ tym stanem tam.
-        hasCube = false; // Upewnij siê, ¿e na starcie gracz nie ma kostki
-
+        hasCube = false;
         player = GameObject.FindGameObjectWithTag("Player");
 
         if (existingCubeLight == null)
@@ -51,7 +45,7 @@ public class CubePickup : MonoBehaviour
         if (playerInRange && Input.GetKeyDown(pickupKey))
         {
             PickUp();
-            if (myCanvas != null) // Dodano sprawdzenie czy myCanvas jest przypisany
+            if (myCanvas != null)
             {
                 myCanvas.SetActive(true);
             }
@@ -64,9 +58,12 @@ public class CubePickup : MonoBehaviour
         {
             existingCubeLight.SetActive(true);
             PlayerMovement playerMovement = FindFirstObjectByType<PlayerMovement>();
-            if (playerMovement != null) // Dodano sprawdzenie
+            if (playerMovement != null)
             {
-                playerMovement.Intutorial = true;
+                // --- FIXED ---
+                // Replaced 'Intutorial = true' with the new method to disable movement.
+                playerMovement.DisableMovement();
+                // -------------
             }
             Cursor.visible = true;
             Cursor.lockState = CursorLockMode.None;
@@ -77,10 +74,8 @@ public class CubePickup : MonoBehaviour
             Debug.LogError("CubeLight reference not set!");
         }
 
-        // --- USTAW FLAGÊ ---
         hasCube = true;
         Debug.Log("Cube has been picked up! Teleport is now potentially active.");
-        // -------------------
 
         Destroy(gameObject);
     }

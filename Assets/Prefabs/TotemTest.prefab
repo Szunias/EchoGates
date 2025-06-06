@@ -69,7 +69,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 60f78579443ad12429042ee85b7944e4, type: 2}
+  - {fileID: 2100000, guid: f7ee0d92c6d99634293cac5cfd76bb25, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -107,7 +107,6 @@ MonoBehaviour:
   totemLightSource: {fileID: 0}
   cageObject: {fileID: 0}
   requiredTotemsToWin: 5
-  activeClip: {fileID: 8300000, guid: 9fc86fe1a2ab8604db7be844e237cdbd, type: 3}
 --- !u!114 &3068676873731279864
 MonoBehaviour:
   m_ObjectHideFlags: 0

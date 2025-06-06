@@ -1,99 +1,157 @@
+// --- Tutorial.cs (Final Version with Advanced Skip UI) ---
 using System.Collections;
 using UnityEngine;
+using UnityEngine.UI; // Required for Slider
 
 public class Tutorial : MonoBehaviour
 {
-    // --- SINGLETON PATTERN ---
     public static Tutorial Instance { get; private set; }
-
-    // --- STATIC FLAG to remember state between scene loads ---
     private static bool tutorialHasBeenPlayed = false;
 
-    // We no longer need a direct reference to the SubtitleManager here,
-    // as we will use the Singleton instance: SubtitleManager.Instance
+    [Header("Skip Settings")]
+    [Tooltip("The key to hold down to skip the tutorial.")]
+    [SerializeField] private KeyCode skipKey = KeyCode.Tab;
+    [Tooltip("How long the player must hold the key to skip (in seconds).")]
+    [SerializeField] private float holdToSkipDuration = 1.5f;
+    [Tooltip("The fade duration for the skip UI.")]
+    [SerializeField] private float fadeDuration = 0.5f;
 
-    private Coroutine tutorialCoroutine; // A reference to our coroutine so we can stop it
+    [Header("UI References")]
+    [Tooltip("The CanvasGroup containing all skip UI elements (text and slider).")]
+    [SerializeField] private CanvasGroup skipUIGroup;
+    [Tooltip("The Slider component used as a progress indicator for skipping.")]
+    [SerializeField] private Slider skipSlider;
+
+    private Coroutine tutorialCoroutine;
+    private float skipHoldTimer = 0f;
+    private bool isRunning = false; // Flag to know if the tutorial is currently active
 
     private void Awake()
     {
-        // Singleton Setup
-        if (Instance != null && Instance != this)
-        {
-            Destroy(gameObject);
-        }
-        else
-        {
-            Instance = this;
-        }
+        if (Instance != null && Instance != this) { Destroy(gameObject); }
+        else { Instance = this; }
     }
 
     void Start()
     {
-        // --- CHECK if the tutorial has already been played ---
-        // If so, don't start it again.
         if (tutorialHasBeenPlayed)
         {
-            Debug.Log("Tutorial has already been played in this session. Skipping.");
-            gameObject.SetActive(false); // Deactivate this object to prevent further logic
+            gameObject.SetActive(false);
             return;
         }
 
-        // If not, start the tutorial sequence
+        // Ensure UI is hidden and configured correctly on start
+        if (skipUIGroup != null)
+        {
+            skipUIGroup.alpha = 0;
+            skipUIGroup.interactable = false;
+        }
+        if (skipSlider != null)
+        {
+            skipSlider.minValue = 0;
+            skipSlider.maxValue = holdToSkipDuration;
+            skipSlider.value = 0;
+        }
+
         tutorialCoroutine = StartCoroutine(PlayTutorialSequence());
     }
 
-    /// <summary>
-    /// Public method to stop the tutorial from other scripts.
-    /// </summary>
+    void Update()
+    {
+        // The skip logic only runs if the tutorial is active
+        if (isRunning)
+        {
+            if (Input.GetKey(skipKey))
+            {
+                skipHoldTimer += Time.deltaTime;
+                if (skipSlider != null)
+                {
+                    skipSlider.value = skipHoldTimer;
+                }
+
+                if (skipHoldTimer >= holdToSkipDuration)
+                {
+                    Debug.Log("Tutorial skipped by player.");
+                    StopTutorial();
+                }
+            }
+            else if (Input.GetKeyUp(skipKey))
+            {
+                // Reset timer and slider if key is released early
+                skipHoldTimer = 0f;
+                if (skipSlider != null)
+                {
+                    skipSlider.value = 0;
+                }
+            }
+        }
+    }
+
     public void StopTutorial()
     {
+        if (!isRunning) return; // Prevent multiple calls
+
+        isRunning = false; // Mark tutorial as no longer running
         if (tutorialCoroutine != null)
         {
             StopCoroutine(tutorialCoroutine);
-            tutorialCoroutine = null; // Clear the reference
-            Debug.Log("Tutorial coroutine stopped.");
-
-            // Also ensure the subtitles are cleared immediately
-            if (SubtitleManager.Instance != null)
-            {
-                SubtitleManager.Instance.HideAndClear();
-            }
-
-            // Mark the tutorial as "finished", even if it was interrupted
-            tutorialHasBeenPlayed = true;
+            tutorialCoroutine = null;
         }
+        Debug.Log("Tutorial stopped.");
+
+        StartCoroutine(FadeUI(false)); // Fade out the skip UI
+
+        if (SubtitleManager.Instance != null) { SubtitleManager.Instance.HideAndClear(); }
+        tutorialHasBeenPlayed = true;
     }
 
     private IEnumerator PlayTutorialSequence()
     {
-        // Check if the SubtitleManager exists
+        isRunning = true;
+        StartCoroutine(FadeUI(true)); // Fade in the skip UI
+
         if (SubtitleManager.Instance == null)
         {
             Debug.LogError("Cannot play tutorial sequence, SubtitleManager.Instance is null.");
+            isRunning = false;
             yield break;
         }
 
         Debug.Log("Starting tutorial sequence...");
-
-        // Wait a moment for the player to look around
+        // This delay is now part of the tutorial itself, not a Start() delay
         yield return new WaitForSeconds(2f);
 
-        // Add subtitles to the queue. The manager will handle timings.
         SubtitleManager.Instance.ShowSubtitle("What is that on the table?");
-
-        // We can add the next one immediately to the queue
         SubtitleManager.Instance.ShowSubtitle("Is that... Captain Sniffles?");
 
-        // After adding all subtitles to the queue, wait for them to finish displaying
-        // before marking the tutorial as complete.
-        // This calculates a rough duration.
-        float waitTime = (SubtitleManager.Instance.defaultDisplayTime + SubtitleManager.Instance.delayBetweenSubtitles) * 2;
-        yield return new WaitForSeconds(waitTime);
+        yield return new WaitUntil(() => SubtitleManager.Instance.IsQueueEmpty && !SubtitleManager.Instance.IsDisplaying);
 
-
-        // Mark the tutorial as played once the sequence is fully complete
+        // When subtitles are done, mark as finished and fade out the skip UI
+        isRunning = false;
         tutorialHasBeenPlayed = true;
         Debug.Log("Tutorial sequence finished and marked as played.");
-        tutorialCoroutine = null; // Clear the reference after completion
+        StartCoroutine(FadeUI(false));
+        tutorialCoroutine = null;
+    }
+
+    private IEnumerator FadeUI(bool fadeIn)
+    {
+        if (skipUIGroup == null) yield break;
+
+        float targetAlpha = fadeIn ? 1f : 0f;
+        float startAlpha = skipUIGroup.alpha;
+        float elapsedTime = 0f;
+
+        // Enable/disable interaction at the start of the fade
+        skipUIGroup.interactable = fadeIn;
+
+        while (elapsedTime < fadeDuration)
+        {
+            elapsedTime += Time.deltaTime;
+            skipUIGroup.alpha = Mathf.Lerp(startAlpha, targetAlpha, elapsedTime / fadeDuration);
+            yield return null;
+        }
+
+        skipUIGroup.alpha = targetAlpha; // Ensure it reaches the final value
     }
 }

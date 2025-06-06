@@ -20,7 +20,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: TotemLight
+  m_Name: Totemunlight
   m_Shader: {fileID: 4800000, guid: 933532a4fcc9baf4fa0491de14d08ed7, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
@@ -133,7 +133,7 @@ Material:
     m_Colors:
     - _BaseColor: {r: 0.7610062, g: 0.7251096, b: 0.7251096, a: 1}
     - _Color: {r: 0.7610062, g: 0.7251096, b: 0.7251096, a: 1}
-    - _EmissionColor: {r: 57.489685, g: 160.43398, b: 220.26175, a: 1}
+    - _EmissionColor: {r: 1.6339486, g: 0.63816476, b: 0.71197516, a: 1}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
